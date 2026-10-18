@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Correct Score Stats - Dutching</title>
+    <style>
+        :root {
+            --bg-color: #121214;
+            --card-bg: #202024;
+            --primary: #00875f;
+            --primary-hover: #00b37e;
+            --text: #e1e1e6;
+            --text-secondary: #a8a8b3;
+            --accent: #00b37e;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            color: #fff;
+            margin: 0 0 6px 0;
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #323238;
+            background-color: #121214;
+            color: #fff;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .results {
+            display: none;
+        }
+
+        .match-info {
+            border-bottom: 1px solid #323238;
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .score-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background-color: #121214;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .score-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .score-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .score-prob {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #00b37e;
+        }
+
+        .disclaimer {
+            font-size: 0.75rem;
+            color: #8d8d99;
+            text-align: center;
+            margin-top: 12px;
+            line-height: 1.3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Correct Score Analyzer</h1>
+        <p>Sugestão de 5 Placares Exatos para Dutching</p>
+    </div>
+
+    <div class="card">
+        <div class="input-group">
+            <label for="home">Time da Casa (Mandante)</label>
+            <input type="text" id="home" placeholder="Ex: Flamengo">
+        </div>
+        <div class="input-group">
+            <label for="away">Time Visitante (Fora)</label>
+            <input type="text" id="away" placeholder="Ex: Fluminense">
+        </div>
+        <button onclick="analisarJogo()">Analisar Partida</button>
+    </div>
+
+    <div id="results" class="card results">
+        <div class="match-info">
+            <h2 id="match-title" style="font-size: 1.1rem; margin: 0; color: #fff;"></h2>
+            <p id="coverage-info" style="font-size: 0.8rem; color: #00b37e; margin: 4px 0 0 0;"></p>
+        </div>
+
+        <div id="score-list"></div>
+
+        <div class="disclaimer">
+            * <strong>Formato Padrão do Mercado:</strong> [Gols Casa - Gols Fora]<br>
+            Aposte a mesma stake em cada um dos 5 placares acima.
+        </div>
+    </div>
+</div>
+
+<script>
+    // Algoritmo de Poisson integrado para rodar direto no navegador
+    function poisson(k, lambda) {
+        return (Math.pow(lambda, k) * Math.exp(-lambda)) / factorial(k);
+    }
+
+    function factorial(n) {
+        if (n === 0 || n === 1) return 1;
+        let res = 1;
+        for (let i = 2; i <= n; i++) res *= i;
+        return res;
+    }
+
+    function analisarJogo() {
+        const home = document.getElementById('home').value;
+        const away = document.getElementById('away').value;
+
+        if (!home || !away) {
+            alert('Por favor, informe os dois times!');
+            return;
+        }
+
+        // Estimativa estatística baseada na média de xG das ligas
+        // (Em produção, esses valores vem da varredura de dados)
+        const xgHome = 1.65;
+        const xgAway = 0.95;
+
+        const maxGols = 5;
+        let placares = [];
+
+        for (let c = 0; c <= maxGols; c++) {
+            for (let f = 0; f <= maxGols; f++) {
+                let probC = poisson(c, xgHome);
+                let probF = poisson(f, xgAway);
+                let probTotal = probC * probF;
+
+                let desc = "";
+                if (c > f) desc = "Casa vence";
+                else if (f > c) desc = "Visitante vence";
+                else desc = "Empate";
+
+                placares.push({
+                    placar: `${c} - ${f}`,
+                    descricao: desc,
+                    prob: probTotal
+                });
+            }
+        }
+
+        // Ordena pelos 5 placares mais prováveis
+        placares.sort((a, b) => b.prob - a.prob);
+        const top5 = placares.slice(0, 5);
+
+        let somaProb = top5.reduce((acc, item) => acc + item.prob, 0);
+
+        // Renderiza Resultados na Tela
+        document.getElementById('match-title').innerText = `${home} vs ${away}`;
+        document.getElementById('coverage-info').innerText = `Cobertura Probabilística: ${(somaProb * 100).toFixed(1)}%`;
+
+        const scoreListDiv = document.getElementById('score-list');
+        scoreListDiv.innerHTML = '';
+
+        top5.forEach((item, index) => {
+            scoreListDiv.innerHTML += `
+                <div class="score-row">
+                    <div>
+                        <div class="score-title">${index + 1}º &nbsp; [ ${item.placar} ]</div>
+                        <div class="score-desc">${item.descricao}</div>
+                    </div>
+                    <div class="score-prob">${(item.prob * 100).toFixed(1)}%</div>
+                </div>
+            `;
+        });
+
+        document.getElementById('results').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
