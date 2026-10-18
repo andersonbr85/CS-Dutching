@@ -148,7 +148,7 @@
 <div class="container">
     <div class="header">
         <h1>Correct Score Analyzer</h1>
-        <p>Sugestão de 5 Placares Exatos para Dutching</p>
+        <p>Varredura de Estatísticas para Dutching</p>
     </div>
 
     <div class="card">
@@ -165,7 +165,7 @@
 
     <div id="results" class="card results">
         <div class="match-info">
-            <h2 id="match-title" style="font-size: 1.1rem; margin: 0; color: #fff;"></h2>
+            <h2 id="match-title" style="font-size: 1.1rem; margin: 0; color: #fff;">Aguardando...</h2>
             <p id="coverage-info" style="font-size: 0.8rem; color: #00b37e; margin: 4px 0 0 0;"></p>
         </div>
 
@@ -179,19 +179,7 @@
 </div>
 
 <script>
-    // Algoritmo de Poisson integrado para rodar direto no navegador
-    function poisson(k, lambda) {
-        return (Math.pow(lambda, k) * Math.exp(-lambda)) / factorial(k);
-    }
-
-    function factorial(n) {
-        if (n === 0 || n === 1) return 1;
-        let res = 1;
-        for (let i = 2; i <= n; i++) res *= i;
-        return res;
-    }
-
-    function analisarJogo() {
+    async function analisarJogo() {
         const home = document.getElementById('home').value;
         const away = document.getElementById('away').value;
 
@@ -200,59 +188,40 @@
             return;
         }
 
-        // Estimativa estatística baseada na média de xG das ligas
-        // (Em produção, esses valores vem da varredura de dados)
-        const xgHome = 1.65;
-        const xgAway = 0.95;
-
-        const maxGols = 5;
-        let placares = [];
-
-        for (let c = 0; c <= maxGols; c++) {
-            for (let f = 0; f <= maxGols; f++) {
-                let probC = poisson(c, xgHome);
-                let probF = poisson(f, xgAway);
-                let probTotal = probC * probF;
-
-                let desc = "";
-                if (c > f) desc = "Casa vence";
-                else if (f > c) desc = "Visitante vence";
-                else desc = "Empate";
-
-                placares.push({
-                    placar: `${c} - ${f}`,
-                    descricao: desc,
-                    prob: probTotal
-                });
-            }
-        }
-
-        // Ordena pelos 5 placares mais prováveis
-        placares.sort((a, b) => b.prob - a.prob);
-        const top5 = placares.slice(0, 5);
-
-        let somaProb = top5.reduce((acc, item) => acc + item.prob, 0);
-
-        // Renderiza Resultados na Tela
-        document.getElementById('match-title').innerText = `${home} vs ${away}`;
-        document.getElementById('coverage-info').innerText = `Cobertura Probabilística: ${(somaProb * 100).toFixed(1)}%`;
-
-        const scoreListDiv = document.getElementById('score-list');
-        scoreListDiv.innerHTML = '';
-
-        top5.forEach((item, index) => {
-            scoreListDiv.innerHTML += `
-                <div class="score-row">
-                    <div>
-                        <div class="score-title">${index + 1}º &nbsp; [ ${item.placar} ]</div>
-                        <div class="score-desc">${item.descricao}</div>
-                    </div>
-                    <div class="score-prob">${(item.prob * 100).toFixed(1)}%</div>
-                </div>
-            `;
-        });
-
+        // Mostra estado de carregamento
         document.getElementById('results').style.display = 'block';
+        document.getElementById('match-title').innerText = 'Varrendo estatísticas...';
+        document.getElementById('coverage-info').innerText = 'Buscando xG e métricas reais';
+        document.getElementById('score-list').innerHTML = '<p style="text-align:center; color:#a8a8b3; padding:10px;">Processando dados na nuvem...</p>';
+
+        try {
+            // URL conectada ao seu backend ativo no Render
+            const urlAPI = `https://cs-dutching-api.onrender.com/analisar?home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}`;
+            
+            const response = await fetch(urlAPI);
+            const data = await response.json();
+
+            document.getElementById('match-title').innerText = data.partida;
+            document.getElementById('coverage-info').innerText = `xG: ${data.xg_casa} x ${data.xg_fora} | Cobertura: ${data.cobertura}%`;
+
+            const scoreListDiv = document.getElementById('score-list');
+            scoreListDiv.innerHTML = '';
+
+            data.top_5.forEach((item, index) => {
+                scoreListDiv.innerHTML += `
+                    <div class="score-row">
+                        <div>
+                            <div class="score-title">${index + 1}º &nbsp; [ ${item.placar} ]</div>
+                            <div class="score-desc">${item.descricao}</div>
+                        </div>
+                        <div class="score-prob">${(item.probabilidade * 100).toFixed(1)}%</div>
+                    </div>
+                `;
+            });
+        } catch (err) {
+            document.getElementById('match-title').innerText = 'Erro de Conexão';
+            document.getElementById('score-list').innerHTML = '<p style="text-align:center; color:#ff5555;">Não foi possível conectar ao servidor de estatísticas.</p>';
+        }
     }
 </script>
 
