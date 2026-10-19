@@ -13,13 +13,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Banco de dados expandido com Métricas de Ataque, Defesa e Forma Recente (últimos 5 jogos)
 ESTATISTICAS_TIMES = {
     "arsenal": {"ataque": 2.15, "defesa": 0.70, "forma": 1.10, "tendencia_empate": 0.90},
     "manchester city": {"ataque": 2.40, "defesa": 0.75, "forma": 1.15, "tendencia_empate": 0.85},
     "liverpool": {"ataque": 2.25, "defesa": 0.80, "forma": 1.12, "tendencia_empate": 0.88},
     "chelsea": {"ataque": 1.70, "defesa": 1.05, "forma": 1.00, "tendencia_empate": 1.05},
     "tottenham": {"ataque": 1.80, "defesa": 1.20, "forma": 0.95, "tendencia_empate": 0.95},
+    "coventry": {"ataque": 1.30, "defesa": 1.15, "forma": 1.00, "tendencia_empate": 1.10},
     "manchester united": {"ataque": 1.55, "defesa": 1.15, "forma": 0.90, "tendencia_empate": 1.00},
     "nottingham": {"ataque": 1.20, "defesa": 1.10, "forma": 1.05, "tendencia_empate": 1.10},
     "aston villa": {"ataque": 1.75, "defesa": 1.10, "forma": 1.08, "tendencia_empate": 0.95},
@@ -52,21 +52,17 @@ def calcular_xg_avancado(time_casa: str, time_fora: str):
     
     fator_casa = 1.15
     
-    # xG base cruzado com Forma Recente (Últimos 5 jogos)
     xg_casa = (stats_casa["ataque"] + stats_fora["defesa"]) / 2 * fator_casa * stats_casa["forma"]
     xg_fora = (stats_fora["ataque"] + stats_casa["defesa"]) / 2 * stats_fora["forma"]
-    
-    # Ajuste de tendência H2H/Clássico
     fator_empate_h2h = (stats_casa["tendencia_empate"] + stats_fora["tendencia_empate"]) / 2
     
-    return round(xg_casa, 2), round(xg_fora, 2), round(fator_empate_h2h, 2)
+    return float(round(xg_casa, 2)), float(round(xg_fora, 2)), float(round(fator_empate_h2h, 2))
 
 @app.get("/analisar")
 def analisar(home: str, away: str):
     xg_casa, xg_fora, fator_h2h = calcular_xg_avancado(home, away)
-    total_xg_esperado = round(xg_casa + xg_fora, 2)
+    total_xg_esperado = float(round(xg_casa + xg_fora, 2))
     
-    # Linha de gols estimada
     linha_gols = "Over 2.5" if total_xg_esperado >= 2.60 else ("Under 2.5" if total_xg_esperado <= 2.20 else "Neutro (2 a 3 gols)")
     
     max_gols = 5
@@ -74,24 +70,21 @@ def analisar(home: str, away: str):
     
     for c in range(max_gols + 1):
         for f in range(max_gols + 1):
-            prob_c = poisson.pmf(c, xg_casa)
-            prob_f = poisson.pmf(f, xg_fora)
+            prob_c = float(poisson.pmf(c, xg_casa))
+            prob_f = float(poisson.pmf(f, xg_fora))
             prob_total = prob_c * prob_f
             
-            # Ajuste dinâmico H2H para placares iguais (empates)
             if c == f:
                 prob_total *= fator_h2h
                 
-            # Filtro de congruência com a linha de gols
             gols_jogo = c + f
             if linha_gols == "Under 2.5" and gols_jogo > 3:
-                prob_total *= 0.70  # Penaliza placares muito altos em jogos de Under
+                prob_total *= 0.70
             elif linha_gols == "Over 2.5" and gols_jogo < 2:
-                prob_total *= 0.75  # Penaliza 0-0 ou 1-0 em jogos com tendência de Over
+                prob_total *= 0.75
 
             desc = "Casa vence" if c > f else ("Visitante vence" if f > c else "Empate")
-            
-            odd_estimada = round(1 / prob_total, 2) if prob_total > 0 else 99.0
+            odd_estimada = float(round(1 / prob_total, 2)) if prob_total > 0 else 99.0
             
             placares.append({
                 "placar": f"{c} - {f}",
@@ -102,10 +95,8 @@ def analisar(home: str, away: str):
             
     top_5 = sorted(placares, key=lambda x: x["probabilidade"], reverse=True)[:5]
     
-    # Cálculo de Valor do Dutching (Soma das Probabilidades Implícitas)
     soma_implicita = sum(1 / p["odd_estimada"] for p in top_5)
-    tem_valor_dutching = soma_implicita < 0.95
-    
+    tem_valor_dutching = bool(soma_implicita < 0.95)
     soma_prob = sum(p["probabilidade"] for p in top_5)
     
     return {
@@ -114,8 +105,8 @@ def analisar(home: str, away: str):
         "xg_fora": xg_fora,
         "total_xg": total_xg_esperado,
         "linha_gols": linha_gols,
-        "cobertura": round(soma_prob * 100, 1),
+        "cobertura": float(round(soma_prob * 100, 1)),
         "tem_valor_dutching": tem_valor_dutching,
-        "soma_implicita": round(soma_implicita, 2),
+        "soma_implicita": float(round(soma_implicita, 2)),
         "top_5": top_5
     }
