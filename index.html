@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Correct Score Stats - Dutching</title>
+    <title>Correct Score Analyzer Pro</title>
     <style>
         :root {
             --bg-color: #121214;
@@ -13,6 +13,7 @@
             --text: #e1e1e6;
             --text-secondary: #a8a8b3;
             --accent: #00b37e;
+            --gold: #e5bf00;
         }
 
         body {
@@ -39,11 +40,11 @@
         .header h1 {
             font-size: 1.4rem;
             color: #fff;
-            margin: 0 0 6px 0;
+            margin: 0 0 4px 0;
         }
 
         .header p {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
             margin: 0;
         }
@@ -106,6 +107,28 @@
             text-align: center;
         }
 
+        .metrics-badge {
+            display: flex;
+            justify-content: space-around;
+            background: #121214;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 0.78rem;
+        }
+
+        .value-tag {
+            display: inline-block;
+            background: #2e2800;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
         .score-row {
             display: flex;
             justify-content: space-between;
@@ -118,24 +141,48 @@
         }
 
         .score-title {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: bold;
             color: #fff;
         }
 
         .score-desc {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-secondary);
         }
 
         .score-prob {
-            font-size: 0.9rem;
+            text-align: right;
+            font-size: 0.85rem;
             font-weight: bold;
             color: #00b37e;
         }
 
+        .score-odd {
+            font-size: 0.72rem;
+            color: var(--gold);
+        }
+
+        .history-box {
+            margin-top: 10px;
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .history-chip {
+            background: #29292e;
+            color: #a8a8b3;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
         .disclaimer {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: #8d8d99;
             text-align: center;
             margin-top: 12px;
@@ -147,62 +194,84 @@
 
 <div class="container">
     <div class="header">
-        <h1>Correct Score Analyzer</h1>
-        <p>Varredura de Estatísticas para Dutching</p>
+        <h1>Correct Score Analyzer Pro</h1>
+        <p>Análise Avançada & Dutching para Correct Score</p>
     </div>
 
     <div class="card">
         <div class="input-group">
             <label for="home">Time da Casa (Mandante)</label>
-            <input type="text" id="home" placeholder="Ex: Flamengo">
+            <input type="text" id="home" placeholder="Ex: CRB">
         </div>
         <div class="input-group">
             <label for="away">Time Visitante (Fora)</label>
-            <input type="text" id="away" placeholder="Ex: Fluminense">
+            <input type="text" id="away" placeholder="Ex: Botafogo SP">
         </div>
         <button onclick="analisarJogo()">Analisar Partida</button>
+
+        <div id="history-container" style="display:none; margin-top:12px;">
+            <label>Análises Recentes:</label>
+            <div id="history-list" class="history-box"></div>
+        </div>
     </div>
 
     <div id="results" class="card results">
         <div class="match-info">
             <h2 id="match-title" style="font-size: 1.1rem; margin: 0; color: #fff;">Aguardando...</h2>
-            <p id="coverage-info" style="font-size: 0.8rem; color: #00b37e; margin: 4px 0 0 0;"></p>
+            
+            <div id="metrics-panel" class="metrics-badge">
+                <span>xG: <strong id="xg-val" style="color:#fff;">-</strong></span>
+                <span>Linha: <strong id="linha-val" style="color:#00b37e;">-</strong></span>
+                <span>Cobertura: <strong id="cob-val" style="color:#fff;">-</strong></span>
+            </div>
+
+            <div id="value-alert" class="value-tag" style="display:none;">
+                ⚡ VALOR MATEMÁTICO DETECTADO NO DUTCHING
+            </div>
         </div>
 
         <div id="score-list"></div>
 
         <div class="disclaimer">
-            * <strong>Formato Padrão do Mercado:</strong> [Gols Casa - Gols Fora]<br>
-            Aposte a mesma stake em cada um dos 5 placares acima.
+            * <strong>Formato Mercado:</strong> [Gols Casa - Gols Fora]<br>
+            Odds estimadas sem margem da casa. Stake igual em cada opção.
         </div>
     </div>
 </div>
 
 <script>
-    async function analisarJogo() {
-        const home = document.getElementById('home').value;
-        const away = document.getElementById('away').value;
+    let historicoJogos = [];
+
+    async function analisarJogo(homeOpt = null, awayOpt = null) {
+        const home = homeOpt || document.getElementById('home').value;
+        const away = awayOpt || document.getElementById('away').value;
 
         if (!home || !away) {
             alert('Por favor, informe os dois times!');
             return;
         }
 
-        // Mostra estado de carregamento
+        document.getElementById('home').value = home;
+        document.getElementById('away').value = away;
+
         document.getElementById('results').style.display = 'block';
-        document.getElementById('match-title').innerText = 'Varrendo estatísticas...';
-        document.getElementById('coverage-info').innerText = 'Buscando xG e métricas reais';
-        document.getElementById('score-list').innerHTML = '<p style="text-align:center; color:#a8a8b3; padding:10px;">Processando dados na nuvem...</p>';
+        document.getElementById('match-title').innerText = 'Cruzando estatísticas recentes e H2H...';
+        document.getElementById('value-alert').style.display = 'none';
+        document.getElementById('score-list').innerHTML = '<p style="text-align:center; color:#a8a8b3; padding:10px;">Calculando probabilidades...</p>';
 
         try {
-            // URL conectada ao seu backend ativo no Render
             const urlAPI = `https://cs-dutching-api.onrender.com/analisar?home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}`;
-            
             const response = await fetch(urlAPI);
             const data = await response.json();
 
             document.getElementById('match-title').innerText = data.partida;
-            document.getElementById('coverage-info').innerText = `xG: ${data.xg_casa} x ${data.xg_fora} | Cobertura: ${data.cobertura}%`;
+            document.getElementById('xg-val').innerText = `${data.xg_casa} x ${data.xg_fora}`;
+            document.getElementById('linha-val').innerText = data.linha_gols;
+            document.getElementById('cob-val').innerText = `${data.cobertura}%`;
+
+            if (data.tem_valor_dutching) {
+                document.getElementById('value-alert').style.display = 'inline-block';
+            }
 
             const scoreListDiv = document.getElementById('score-list');
             scoreListDiv.innerHTML = '';
@@ -214,14 +283,39 @@
                             <div class="score-title">${index + 1}º &nbsp; [ ${item.placar} ]</div>
                             <div class="score-desc">${item.descricao}</div>
                         </div>
-                        <div class="score-prob">${(item.probabilidade * 100).toFixed(1)}%</div>
+                        <div class="score-prob">
+                            ${(item.probabilidade * 100).toFixed(1)}%
+                            <div class="score-odd">Odd Média ~ @${item.odd_estimada.toFixed(2)}</div>
+                        </div>
                     </div>
                 `;
             });
+
+            salvarHistorico(home, away);
+
         } catch (err) {
-            document.getElementById('match-title').innerText = 'Erro de Conexão';
-            document.getElementById('score-list').innerHTML = '<p style="text-align:center; color:#ff5555;">Não foi possível conectar ao servidor de estatísticas.</p>';
+            document.getElementById('match-title').innerText = 'Erro ao consultar';
+            document.getElementById('score-list').innerHTML = '<p style="text-align:center; color:#ff5555;">Servidor em aquecimento. Tente novamente em 20 segundos.</p>';
         }
+    }
+
+    function salvarHistorico(h, a) {
+        const itemStr = `${h} x ${a}`;
+        if (!historicoJogos.includes(itemStr)) {
+            historicoJogos.unshift(itemStr);
+            if (historicoJogos.length > 5) historicoJogos.pop();
+            atualizarBarraHistorico();
+        }
+    }
+
+    function atualizarBarraHistorico() {
+        const listDiv = document.getElementById('history-list');
+        listDiv.innerHTML = '';
+        historicoJogos.forEach(item => {
+            const parts = item.split(' x ');
+            listDiv.innerHTML += `<div class="history-chip" onclick="analisarJogo('${parts[0]}', '${parts[1]}')">${item}</div>`;
+        });
+        document.getElementById('history-container').style.display = 'block';
     }
 </script>
 
