@@ -60,121 +60,20 @@ ESTATISTICAS_TIMES = {
     "newell's old boys": {"ataque": 1.15, "defesa": 1.05, "forma": 0.95, "tendencia_empate": 1.15},
     "central córdoba": {"ataque": 1.05, "defesa": 1.20, "forma": 0.90, "tendencia_empate": 1.15},
 
-    # --- HOLANDA (Eredivisie) ---
+    # --- OUTROS ---
     "ajax": {"ataque": 2.10, "defesa": 0.90, "forma": 1.08, "tendencia_empate": 0.95},
     "psv": {"ataque": 2.30, "defesa": 0.80, "forma": 1.12, "tendencia_empate": 0.90},
     "feyenoord": {"ataque": 2.05, "defesa": 0.85, "forma": 1.10, "tendencia_empate": 0.92},
-    "az alkmaar": {"ataque": 1.70, "defesa": 1.00, "forma": 1.02, "tendencia_empate": 1.00},
-    "utrecht": {"ataque": 1.45, "defesa": 1.15, "forma": 1.00, "tendencia_empate": 1.05},
-
-    # --- PORTUGAL (Primeira Liga) ---
     "benfica": {"ataque": 2.10, "defesa": 0.75, "forma": 1.12, "tendencia_empate": 0.90},
     "sporting": {"ataque": 2.20, "defesa": 0.75, "forma": 1.15, "tendencia_empate": 0.88},
     "fc porto": {"ataque": 2.00, "defesa": 0.78, "forma": 1.10, "tendencia_empate": 0.92},
-    "braga": {"ataque": 1.65, "defesa": 1.05, "forma": 1.02, "tendencia_empate": 1.00},
-    "vitoria guimaraes": {"ataque": 1.35, "defesa": 1.10, "forma": 1.00, "tendencia_empate": 1.05},
-
-    # --- TURQUIA (Süper Lig) ---
     "galatasaray": {"ataque": 2.15, "defesa": 0.80, "forma": 1.12, "tendencia_empate": 0.90},
     "fenerbahce": {"ataque": 2.10, "defesa": 0.82, "forma": 1.10, "tendencia_empate": 0.92},
-    "besiktas": {"ataque": 1.70, "defesa": 1.05, "forma": 1.00, "tendencia_empate": 1.00},
-    "trabzonspor": {"ataque": 1.55, "defesa": 1.10, "forma": 0.98, "tendencia_empate": 1.05},
-
-    # --- ARÁBIA SAUDITA (Saudi Pro League) ---
     "al hilal": {"ataque": 2.30, "defesa": 0.75, "forma": 1.15, "tendencia_empate": 0.85},
     "al nassr": {"ataque": 2.20, "defesa": 0.85, "forma": 1.12, "tendencia_empate": 0.90},
-    "al ahli": {"ataque": 1.80, "defesa": 1.00, "forma": 1.05, "tendencia_empate": 0.98},
-    "al ittihad": {"ataque": 1.85, "defesa": 0.95, "forma": 1.05, "tendencia_empate": 0.95},
-
-    # --- SUÉCIA (Allsvenskan) ---
-    "malmo ff": {"ataque": 1.80, "defesa": 0.85, "forma": 1.10, "tendencia_empate": 0.95},
-    "aik": {"ataque": 1.40, "defesa": 1.05, "forma": 1.00, "tendencia_empate": 1.10},
-    "djurgarden": {"ataque": 1.50, "defesa": 1.00, "forma": 1.02, "tendencia_empate": 1.05},
-
-    # --- NORUEGA (Eliteserien) ---
-    "bodo/glimt": {"ataque": 2.10, "defesa": 0.85, "forma": 1.12, "tendencia_empate": 0.90},
-    "molde": {"ataque": 1.80, "defesa": 0.95, "forma": 1.05, "tendencia_empate": 0.98},
-    "rosenborg": {"ataque": 1.50, "defesa": 1.10, "forma": 0.98, "tendencia_empate": 1.05},
-
-    # --- DINAMARCA (Superliga) ---
-    "fc copenhagen": {"ataque": 1.90, "defesa": 0.85, "forma": 1.08, "tendencia_empate": 0.95},
-    "midtjylland": {"ataque": 1.85, "defesa": 0.90, "forma": 1.06, "tendencia_empate": 0.98},
-    "brondby": {"ataque": 1.60, "defesa": 1.05, "forma": 1.00, "tendencia_empate": 1.02},
-
-    # --- JAPÃO (J1 League) ---
-    "vissel kobe": {"ataque": 1.65, "defesa": 0.90, "forma": 1.05, "tendencia_empate": 1.05},
-    "sanfrecce hiroshima": {"ataque": 1.60, "defesa": 0.85, "forma": 1.04, "tendencia_empate": 1.08},
-    "yokohama f marinos": {"ataque": 1.75, "defesa": 1.10, "forma": 1.00, "tendencia_empate": 1.00},
-
-    # --- AUSTRÁLIA (A-League) ---
-    "melbourne city": {"ataque": 1.70, "defesa": 1.10, "forma": 1.02, "tendencia_empate": 1.00},
-    "sydney fc": {"ataque": 1.65, "defesa": 1.15, "forma": 1.00, "tendencia_empate": 1.02},
-
-    # --- MLS (EUA / Canadá) ---
     "inter miami": {"ataque": 2.05, "defesa": 1.15, "forma": 1.10, "tendencia_empate": 0.90},
-    "LA galaxy": {"ataque": 1.75, "defesa": 1.10, "forma": 1.05, "tendencia_empate": 0.98},
-    "columbus crew": {"ataque": 1.80, "defesa": 0.95, "forma": 1.08, "tendencia_empate": 0.95},
-
-    # --- EQUADOR ---
-    "independiente del valle": {"ataque": 1.75, "defesa": 0.85, "forma": 1.08, "tendencia_empate": 0.98},
-    "liga de quito": {"ataque": 1.70, "defesa": 0.90, "forma": 1.05, "tendencia_empate": 1.00},
-    "barcelona sc": {"ataque": 1.60, "defesa": 0.95, "forma": 1.02, "tendencia_empate": 1.02},
-
-    # --- COLÔMBIA ---
-    "millonarios": {"ataque": 1.50, "defesa": 0.90, "forma": 1.02, "tendencia_empate": 1.10},
-    "atletico nacional": {"ataque": 1.60, "defesa": 0.95, "forma": 1.05, "tendencia_empate": 1.05},
-    "junior": {"ataque": 1.45, "defesa": 1.00, "forma": 1.00, "tendencia_empate": 1.08},
-
-    # --- PARAGUAI ---
-    "olimpia": {"ataque": 1.60, "defesa": 0.90, "forma": 1.05, "tendencia_empate": 1.05},
-    "cerro porteno": {"ataque": 1.55, "defesa": 0.95, "forma": 1.02, "tendencia_empate": 1.05},
-    "libertad": {"ataque": 1.65, "defesa": 0.88, "forma": 1.08, "tendencia_empate": 1.00},
-
-    # --- URUGUAI ---
-    "peñarol": {"ataque": 1.60, "defesa": 0.85, "forma": 1.05, "tendencia_empate": 1.05},
-    "nacional": {"ataque": 1.58, "defesa": 0.88, "forma": 1.04, "tendencia_empate": 1.05},
-
-    # --- CHILE ---
-    "colocolo": {"ataque": 1.55, "defesa": 0.90, "forma": 1.05, "tendencia_empate": 1.05},
-    "universidad de chile": {"ataque": 1.50, "defesa": 0.92, "forma": 1.02, "tendencia_empate": 1.08},
-    "universidad catolica": {"ataque": 1.45, "defesa": 0.98, "forma": 1.00, "tendencia_empate": 1.05},
-
-    # --- CHINA ---
-    "shanghai port": {"ataque": 1.95, "defesa": 0.90, "forma": 1.10, "tendencia_empate": 0.95},
-    "shandong taishan": {"ataque": 1.70, "defesa": 1.00, "forma": 1.02, "tendencia_empate": 1.02},
-
-    # --- COREIA DO SUL ---
-    "ulsan hyundai": {"ataque": 1.65, "defesa": 0.90, "forma": 1.05, "tendencia_empate": 1.05},
-    "jeonbuk motors": {"ataque": 1.60, "defesa": 0.95, "forma": 1.02, "tendencia_empate": 1.05},
-
-    # --- SUÍÇA ---
-    "young boys": {"ataque": 1.85, "defesa": 1.00, "forma": 1.05, "tendencia_empate": 1.00},
-    "basel": {"ataque": 1.60, "defesa": 1.05, "forma": 1.00, "tendencia_empate": 1.05},
-
-    # --- ÁUSTRIA ---
-    "red bull salzburg": {"ataque": 2.05, "defesa": 0.85, "forma": 1.10, "tendencia_empate": 0.90},
-    "sturm graz": {"ataque": 1.65, "defesa": 0.95, "forma": 1.04, "tendencia_empate": 1.00},
-
-    # --- BOLÍVIA ---
-    "bolivar": {"ataque": 1.90, "defesa": 0.95, "forma": 1.10, "tendencia_empate": 0.95},
-    "the strongest": {"ataque": 1.80, "defesa": 1.00, "forma": 1.05, "tendencia_empate": 1.00},
-
-    # --- PERU ---
-    "universitario": {"ataque": 1.55, "defesa": 0.85, "forma": 1.05, "tendencia_empate": 1.10},
-    "alianza lima": {"ataque": 1.50, "defesa": 0.90, "forma": 1.02, "tendencia_empate": 1.08},
-    "sporting cristal": {"ataque": 1.60, "defesa": 0.95, "forma": 1.04, "tendencia_empate": 1.05},
-
-    # --- ESCÓCIA ---
     "celtic": {"ataque": 2.20, "defesa": 0.75, "forma": 1.15, "tendencia_empate": 0.85},
     "rangers": {"ataque": 2.05, "defesa": 0.80, "forma": 1.12, "tendencia_empate": 0.90},
-
-    # --- IRLANDA ---
-    "shamrock rovers": {"ataque": 1.60, "defesa": 0.90, "forma": 1.05, "tendencia_empate": 1.05},
-    "st patrick's": {"ataque": 1.35, "defesa": 1.05, "forma": 1.00, "tendencia_empate": 1.10},
-
-    # --- PAÍS DE GALES ---
-    "the new saints": {"ataque": 2.10, "defesa": 0.75, "forma": 1.15, "tendencia_empate": 0.85},
-    "connah's quay": {"ataque": 1.40, "defesa": 1.05, "forma": 1.00, "tendencia_empate": 1.10},
 }
 
 def calcular_xg_avancado(time_casa: str, time_fora: str):
@@ -232,7 +131,33 @@ def analisar(home: str, away: str):
                 "odd_estimada": odd_estimada
             })
             
-    top_5 = sorted(placares, key=lambda x: x["probabilidade"], reverse=True)[:5]
+    # Ordenar por maior probabilidade pura
+    placares_ordenados = sorted(placares, key=lambda x: x["probabilidade"], reverse=True)
+    
+    # Pegamos os 4 placares mais prováveis do topo
+    top_4 = placares_ordenados[:4]
+    placares_ja_inclusos = {p["placar"] for p in top_4}
+    
+    # Seleção inteligente do 5º placar de proteção elástica:
+    # Procuramos nos restantes o placar com maior elasticidade (soma de gols >= 3 ou variação de golo extra)
+    # que tenha uma probabilidade viável para atuar como seguro de volatilidade.
+    quinto_placar = None
+    for item in placares_ordenados[4:]:
+        gols_c, gols_f = map(int, item["placar"].split(" - "))
+        # Consideramos como excelente proteção elástica placares de 3 gols ou mais (goleadas/jogos abertos)
+        if (gols_c + gols_f) >= 3 or abs(gols_c - gols_f) >= 2:
+            if item["placar"] not in placares_ja_inclusos:
+                # Marcar visualmente que este é o placar de proteção/seguro
+                item["descricao"] += " (🛡️ Proteção Elástica)"
+                quinto_placar = item
+                break
+                
+    # Fallback caso encontre todos muito restritos: pega simplesmente o 5º natural
+    if not quinto_placar:
+        quinto_placar = placares_ordenados[4]
+        quinto_placar["descricao"] += " (🛡️ Proteção Elástica)"
+        
+    top_5 = top_4 + [quinto_placar]
     
     soma_implicita = sum(1 / p["odd_estimada"] for p in top_5)
     tem_valor_dutching = bool(soma_implicita < 0.95)
