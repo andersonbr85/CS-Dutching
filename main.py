@@ -60,18 +60,28 @@ ESTATISTICAS_TIMES = {
     "newell's old boys": {"ataque": 1.15, "defesa": 1.05, "forma": 0.95, "tendencia_empate": 1.15},
     "central córdoba": {"ataque": 1.05, "defesa": 1.20, "forma": 0.90, "tendencia_empate": 1.15},
 
-    # --- OUTROS ---
+    # --- HOLANDA ---
     "ajax": {"ataque": 2.10, "defesa": 0.90, "forma": 1.08, "tendencia_empate": 0.95},
     "psv": {"ataque": 2.30, "defesa": 0.80, "forma": 1.12, "tendencia_empate": 0.90},
     "feyenoord": {"ataque": 2.05, "defesa": 0.85, "forma": 1.10, "tendencia_empate": 0.92},
+
+    # --- PORTUGAL ---
     "benfica": {"ataque": 2.10, "defesa": 0.75, "forma": 1.12, "tendencia_empate": 0.90},
     "sporting": {"ataque": 2.20, "defesa": 0.75, "forma": 1.15, "tendencia_empate": 0.88},
     "fc porto": {"ataque": 2.00, "defesa": 0.78, "forma": 1.10, "tendencia_empate": 0.92},
+
+    # --- TURQUIA ---
     "galatasaray": {"ataque": 2.15, "defesa": 0.80, "forma": 1.12, "tendencia_empate": 0.90},
     "fenerbahce": {"ataque": 2.10, "defesa": 0.82, "forma": 1.10, "tendencia_empate": 0.92},
+
+    # --- ARÁBIA SAUDITA ---
     "al hilal": {"ataque": 2.30, "defesa": 0.75, "forma": 1.15, "tendencia_empate": 0.85},
     "al nassr": {"ataque": 2.20, "defesa": 0.85, "forma": 1.12, "tendencia_empate": 0.90},
+
+    # --- MLS ---
     "inter miami": {"ataque": 2.05, "defesa": 1.15, "forma": 1.10, "tendencia_empate": 0.90},
+
+    # --- ESCÓCIA ---
     "celtic": {"ataque": 2.20, "defesa": 0.75, "forma": 1.15, "tendencia_empate": 0.85},
     "rangers": {"ataque": 2.05, "defesa": 0.80, "forma": 1.12, "tendencia_empate": 0.90},
 }
@@ -131,33 +141,8 @@ def analisar(home: str, away: str):
                 "odd_estimada": odd_estimada
             })
             
-    # Ordenar por maior probabilidade pura
-    placares_ordenados = sorted(placares, key=lambda x: x["probabilidade"], reverse=True)
-    
-    # Pegamos os 4 placares mais prováveis do topo
-    top_4 = placares_ordenados[:4]
-    placares_ja_inclusos = {p["placar"] for p in top_4}
-    
-    # Seleção inteligente do 5º placar de proteção elástica:
-    # Procuramos nos restantes o placar com maior elasticidade (soma de gols >= 3 ou variação de golo extra)
-    # que tenha uma probabilidade viável para atuar como seguro de volatilidade.
-    quinto_placar = None
-    for item in placares_ordenados[4:]:
-        gols_c, gols_f = map(int, item["placar"].split(" - "))
-        # Consideramos como excelente proteção elástica placares de 3 gols ou mais (goleadas/jogos abertos)
-        if (gols_c + gols_f) >= 3 or abs(gols_c - gols_f) >= 2:
-            if item["placar"] not in placares_ja_inclusos:
-                # Marcar visualmente que este é o placar de proteção/seguro
-                item["descricao"] += " (🛡️ Proteção Elástica)"
-                quinto_placar = item
-                break
-                
-    # Fallback caso encontre todos muito restritos: pega simplesmente o 5º natural
-    if not quinto_placar:
-        quinto_placar = placares_ordenados[4]
-        quinto_placar["descricao"] += " (🛡️ Proteção Elástica)"
-        
-    top_5 = top_4 + [quinto_placar]
+    # Retorna estritamente os 5 placares com maior probabilidade
+    top_5 = sorted(placares, key=lambda x: x["probabilidade"], reverse=True)[:5]
     
     soma_implicita = sum(1 / p["odd_estimada"] for p in top_5)
     tem_valor_dutching = bool(soma_implicita < 0.95)
