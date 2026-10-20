@@ -145,9 +145,10 @@
         }
 
         .championship-name {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             text-align: center;
-            color: var(--text-muted);
+            color: var(--primary);
+            font-weight: 600;
             margin-bottom: 15px;
         }
 
@@ -299,7 +300,6 @@
     <script>
         const API_URL = "https://cs-dutching-api.onrender.com";
 
-        // Gerenciamento de Tema
         function toggleTheme() {
             const body = document.body;
             const currentTheme = body.getAttribute("data-theme");
@@ -339,12 +339,10 @@
                     document.getElementById("res-coverage").innerText = `${data.cobertura}%`;
                     document.getElementById("res-implied").innerText = data.soma_implicita;
 
-                    // Alerta de volatilidade
                     const alertBox = document.getElementById("res-volatility");
                     alertBox.innerText = data.alerta_volatilidade;
                     alertBox.className = "alert-box " + (data.cobertura < 40 ? "alert-warning" : (data.cobertura >= 55 ? "alert-success" : "alert-neutral"));
 
-                    // Tabela Top 5
                     const tbody = document.getElementById("res-table-body");
                     tbody.innerHTML = "";
                     data.top_5.forEach(item => {
