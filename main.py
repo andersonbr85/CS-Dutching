@@ -13,15 +13,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Configuração da API-Football com a sua chave
 API_KEY = "B7ae21f7f0e5920369e6cd9e7bc63ccc"
 BASE_URL = "https://v3.football.api-sports.io"
 
 def buscar_estatisticas_e_liga(time_nome: str):
-    """
-    Busca o ID do time e o histórico das últimas 10 partidas finalizadas na API-Football.
-    Calcula médias reais de gols pró/contra e extrai o nome do campeonato.
-    """
     headers = {"x-apisports-key": API_KEY}
     liga_nome = "Competição Geral"
     
@@ -42,7 +37,7 @@ def buscar_estatisticas_e_liga(time_nome: str):
                     total_jogos = len(fixtures_data)
                     
                     if total_jogos > 0:
-                        # Extrai o nome da liga/campeonato do último jogo
+                        # Extrai o nome exato do campeonato da última partida
                         liga_nome = fixtures_data[0].get("league", {}).get("name", "Liga Principal")
                         gols_marcados = 0
                         gols_sofridos = 0
@@ -71,7 +66,7 @@ def buscar_estatisticas_e_liga(time_nome: str):
                         
         return {"ataque": 1.30, "defesa": 1.10, "forma": 1.00, "liga": liga_nome}
     except Exception:
-        return {"ataque": 1.25, "defesa": 1.15, "forma": 1.00, "liga": "Indisponível"}
+        return {"ataque": 1.25, "defesa": 1.15, "forma": 1.00, "liga": "Competição Geral"}
 
 def calcular_xg_real(time_casa: str, time_fora: str):
     stats_casa = buscar_estatisticas_e_liga(time_casa)
@@ -81,7 +76,6 @@ def calcular_xg_real(time_casa: str, time_fora: str):
     xg_casa = (stats_casa["ataque"] + stats_fora["defesa"]) / 2 * fator_casa * stats_casa["forma"]
     xg_fora = (stats_fora["ataque"] + stats_casa["defesa"]) / 2 * stats_fora["forma"]
     
-    # Dá prioridade ao campeonato onde o time mandante disputa
     campeonato = stats_casa.get("liga", "Competição Geral")
     
     return float(round(xg_casa, 2)), float(round(xg_fora, 2)), campeonato
@@ -117,7 +111,6 @@ def analisar(home: str, away: str):
                 "odd_estimada": odd_estimada
             })
             
-    # Retorna os 5 placares com maior probabilidade estatística pura
     top_5 = sorted(placares, key=lambda x: x["probabilidade"], reverse=True)[:5]
     
     soma_implicita = sum(1 / p["odd_estimada"] for p in top_5)
@@ -126,7 +119,6 @@ def analisar(home: str, away: str):
     
     cobertura_percentual = float(round(soma_prob * 100, 1))
     
-    # Classificação de risco/volatilidade
     if cobertura_percentual < 40.0:
         alerta_volatilidade = "⚠️ Alerta: Jogo de Alta Volatilidade (Risco Elevado para Dutching)"
     elif cobertura_percentual >= 55.0:
