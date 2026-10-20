@@ -1,6 +1,6 @@
+import requests
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import numpy as np
 from scipy.stats import poisson
 
 app = FastAPI()
@@ -13,97 +13,70 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Base de dados global ampliada (Grandes Ligas + Ligas Internacionais de 1ª Divisão)
-ESTATISTICAS_TIMES = {
-    # --- INGLATERRA ---
-    "arsenal": {"ataque": 2.15, "defesa": 0.70, "forma": 1.10, "tendencia_empate": 0.90},
-    "manchester city": {"ataque": 2.40, "defesa": 0.75, "forma": 1.15, "tendencia_empate": 0.85},
-    "liverpool": {"ataque": 2.25, "defesa": 0.80, "forma": 1.12, "tendencia_empate": 0.88},
-    "chelsea": {"ataque": 1.70, "defesa": 1.05, "forma": 1.00, "tendencia_empate": 1.05},
-    "tottenham": {"ataque": 1.80, "defesa": 1.20, "forma": 0.95, "tendencia_empate": 0.95},
-    "manchester united": {"ataque": 1.55, "defesa": 1.15, "forma": 0.90, "tendencia_empate": 1.00},
-    "aston villa": {"ataque": 1.75, "defesa": 1.10, "forma": 1.08, "tendencia_empate": 0.95},
-    "newcastle": {"ataque": 1.65, "defesa": 1.15, "forma": 0.98, "tendencia_empate": 1.00},
-    "coventry": {"ataque": 1.20, "defesa": 1.20, "forma": 1.00, "tendencia_empate": 1.10},
+# Configuração da API-Football
+API_KEY = "B7ae21f7f0e5920369e6cd9e7bc63ccc"
+BASE_URL = "https://v3.football.api-sports.io"
 
-    # --- ESPANHA ---
-    "real madrid": {"ataque": 2.45, "defesa": 0.70, "forma": 1.20, "tendencia_empate": 0.80},
-    "barcelona": {"ataque": 2.35, "defesa": 0.75, "forma": 1.15, "tendencia_empate": 0.85},
-    "atletico madrid": {"ataque": 1.60, "defesa": 0.80, "forma": 1.00, "tendencia_empate": 1.15},
-
-    # --- ITÁLIA ---
-    "inter milan": {"ataque": 1.95, "defesa": 0.75, "forma": 1.12, "tendencia_empate": 0.95},
-    "juventus": {"ataque": 1.50, "defesa": 0.80, "forma": 1.05, "tendencia_empate": 1.20},
-    "ac milan": {"ataque": 1.65, "defesa": 1.05, "forma": 0.98, "tendencia_empate": 1.05},
-
-    # --- ALEMANHA ---
-    "bayern munich": {"ataque": 2.60, "defesa": 0.80, "forma": 1.10, "tendencia_empate": 0.80},
-    "dortmund": {"ataque": 1.90, "defesa": 1.25, "forma": 1.00, "tendencia_empate": 0.95},
-
-    # --- FRANÇA ---
-    "psg": {"ataque": 2.40, "defesa": 0.85, "forma": 1.10, "tendencia_empate": 0.90},
-    "marseille": {"ataque": 1.65, "defesa": 1.05, "forma": 1.02, "tendencia_empate": 1.00},
-
-    # --- BRASIL ---
-    "flamengo": {"ataque": 1.85, "defesa": 0.85, "forma": 1.10, "tendencia_empate": 0.90},
-    "palmeiras": {"ataque": 1.80, "defesa": 0.80, "forma": 1.08, "tendencia_empate": 0.95},
-    "botafogo": {"ataque": 1.75, "defesa": 0.90, "forma": 1.05, "tendencia_empate": 1.00},
-    "sao paulo": {"ataque": 1.40, "defesa": 0.95, "forma": 0.95, "tendencia_empate": 1.10},
-    "corinthians": {"ataque": 1.30, "defesa": 1.05, "forma": 0.90, "tendencia_empate": 1.15},
-    "fluminense": {"ataque": 1.45, "defesa": 1.10, "forma": 0.92, "tendencia_empate": 1.05},
-    "crb": {"ataque": 1.20, "defesa": 1.10, "forma": 1.00, "tendencia_empate": 1.15},
-    "botafogo sp": {"ataque": 1.00, "defesa": 1.15, "forma": 0.95, "tendencia_empate": 1.20},
-
-    # --- ARGENTINA ---
-    "river plate": {"ataque": 1.80, "defesa": 0.85, "forma": 1.10, "tendencia_empate": 0.95},
-    "boca juniors": {"ataque": 1.65, "defesa": 0.90, "forma": 1.05, "tendencia_empate": 1.00},
-    "newell's old boys": {"ataque": 1.15, "defesa": 1.05, "forma": 0.95, "tendencia_empate": 1.15},
-    "central córdoba": {"ataque": 1.05, "defesa": 1.20, "forma": 0.90, "tendencia_empate": 1.15},
-
-    # --- HOLANDA ---
-    "ajax": {"ataque": 2.10, "defesa": 0.90, "forma": 1.08, "tendencia_empate": 0.95},
-    "psv": {"ataque": 2.30, "defesa": 0.80, "forma": 1.12, "tendencia_empate": 0.90},
-    "feyenoord": {"ataque": 2.05, "defesa": 0.85, "forma": 1.10, "tendencia_empate": 0.92},
-
-    # --- PORTUGAL ---
-    "benfica": {"ataque": 2.10, "defesa": 0.75, "forma": 1.12, "tendencia_empate": 0.90},
-    "sporting": {"ataque": 2.20, "defesa": 0.75, "forma": 1.15, "tendencia_empate": 0.88},
-    "fc porto": {"ataque": 2.00, "defesa": 0.78, "forma": 1.10, "tendencia_empate": 0.92},
-
-    # --- TURQUIA ---
-    "galatasaray": {"ataque": 2.15, "defesa": 0.80, "forma": 1.12, "tendencia_empate": 0.90},
-    "fenerbahce": {"ataque": 2.10, "defesa": 0.82, "forma": 1.10, "tendencia_empate": 0.92},
-
-    # --- ARÁBIA SAUDITA ---
-    "al hilal": {"ataque": 2.30, "defesa": 0.75, "forma": 1.15, "tendencia_empate": 0.85},
-    "al nassr": {"ataque": 2.20, "defesa": 0.85, "forma": 1.12, "tendencia_empate": 0.90},
-
-    # --- MLS ---
-    "inter miami": {"ataque": 2.05, "defesa": 1.15, "forma": 1.10, "tendencia_empate": 0.90},
-
-    # --- ESCÓCIA ---
-    "celtic": {"ataque": 2.20, "defesa": 0.75, "forma": 1.15, "tendencia_empate": 0.85},
-    "rangers": {"ataque": 2.05, "defesa": 0.80, "forma": 1.12, "tendencia_empate": 0.90},
-}
-
-def calcular_xg_avancado(time_casa: str, time_fora: str):
-    casa_key = time_casa.strip().lower()
-    fora_key = time_fora.strip().lower()
+def buscar_estatisticas_reais(time_nome: str):
+    """
+    Busca estatísticas reais de desempenho diretamente da API-Football em tempo real.
+    """
+    headers = {
+        "x-apisports-key": API_KEY
+    }
     
-    stats_casa = ESTATISTICAS_TIMES.get(casa_key, {"ataque": 1.25, "defesa": 1.15, "forma": 1.00, "tendencia_empate": 1.00})
-    stats_fora = ESTATISTICAS_TIMES.get(fora_key, {"ataque": 1.10, "defesa": 1.20, "forma": 1.00, "tendencia_empate": 1.00})
+    try:
+        # 1. Pesquisar o ID da equipa pelo nome
+        url_busca = f"{BASE_URL}/teams?search={time_nome}"
+        response = requests.get(url_busca, headers=headers, timeout=5)
+        
+        if response.status_code == 200:
+            data = response.json()
+            teams = data.get("response", [])
+            if teams:
+                team_id = teams[0].get("team", {}).get("id")
+                # Pegamos a temporada atual (ex: 2026)
+                temporada = 2026
+                
+                # 2. Buscar estatísticas gerais da equipa na temporada
+                url_stats = f"{BASE_URL}/teams/statistics?season={temporada}&team={team_id}&league=39" # Liga de exemplo ou geral
+                res_stats = requests.get(url_stats, headers=headers, timeout=5)
+                
+                if res_stats.status_code == 200:
+                    stats_data = res_stats.json().get("response", {})
+                    gols_favor = stats_data.get("goals", {}).get("for", {}).get("average", {}).get("total", "1.3")
+                    gols_contra = stats_data.get("goals", {}).get("against", {}).get("average", {}).get("total", "1.1")
+                    
+                    media_ataque = float(gols_favor) if str(gols_favor).replace('.', '', 1).isdigit() else 1.3
+                    media_defesa = float(gols_contra) if str(gols_contra).replace('.', '', 1).isdigit() else 1.1
+                    
+                    return {
+                        "ataque": max(media_ataque, 0.5),
+                        "defesa": max(media_defesa, 0.5),
+                        "forma": 1.05
+                    }
+                    
+        # Fallback caso a equipa não seja encontrada de imediato
+        return {"ataque": 1.35, "defesa": 1.10, "forma": 1.00}
+        
+    except Exception:
+        # Fallback de segurança em caso de instabilidade na rede
+        return {"ataque": 1.30, "defesa": 1.15, "forma": 1.00}
+
+def calcular_xg_real(time_casa: str, time_fora: str):
+    stats_casa = buscar_estatisticas_reais(time_casa)
+    stats_fora = buscar_estatisticas_reais(time_fora)
     
-    fator_casa = 1.10
+    fator_casa = 1.12
     
     xg_casa = (stats_casa["ataque"] + stats_fora["defesa"]) / 2 * fator_casa * stats_casa["forma"]
     xg_fora = (stats_fora["ataque"] + stats_casa["defesa"]) / 2 * stats_fora["forma"]
-    fator_empate_h2h = (stats_casa["tendencia_empate"] + stats_fora["tendencia_empate"]) / 2
     
-    return float(round(xg_casa, 2)), float(round(xg_fora, 2)), float(round(fator_empate_h2h, 2))
+    return float(round(xg_casa, 2)), float(round(xg_fora, 2))
 
 @app.get("/analisar")
 def analisar(home: str, away: str):
-    xg_casa, xg_fora, fator_h2h = calcular_xg_avancado(home, away)
+    xg_casa, xg_fora = calcular_xg_real(home, away)
     total_xg_esperado = float(round(xg_casa + xg_fora, 2))
     
     if total_xg_esperado >= 2.80:
@@ -122,15 +95,6 @@ def analisar(home: str, away: str):
             prob_f = float(poisson.pmf(f, xg_fora))
             prob_total = prob_c * prob_f
             
-            if c == f:
-                prob_total *= fator_h2h
-                
-            gols_jogo = c + f
-            if linha_gols == "Under 2.5" and gols_jogo > 3:
-                prob_total *= 0.70
-            elif linha_gols == "Over 2.5" and gols_jogo < 2:
-                prob_total *= 0.75
-
             desc = "Casa vence" if c > f else ("Visitante vence" if f > c else "Empate")
             odd_estimada = float(round(1 / prob_total, 2)) if prob_total > 0 else 99.0
             
@@ -141,7 +105,6 @@ def analisar(home: str, away: str):
                 "odd_estimada": odd_estimada
             })
             
-    # Retorna estritamente os 5 placares com maior probabilidade
     top_5 = sorted(placares, key=lambda x: x["probabilidade"], reverse=True)[:5]
     
     soma_implicita = sum(1 / p["odd_estimada"] for p in top_5)
