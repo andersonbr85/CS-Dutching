@@ -201,12 +201,63 @@
     <div class="card">
         <div class="input-group">
             <label for="home">Time da Casa (Mandante)</label>
-            <input type="text" id="home" placeholder="Ex: CRB">
+            <input type="text" id="home" placeholder="Comece a digitar o time..." list="teams-list">
         </div>
         <div class="input-group">
             <label for="away">Time Visitante (Fora)</label>
-            <input type="text" id="away" placeholder="Ex: Botafogo SP">
+            <input type="text" id="away" placeholder="Comece a digitar o time..." list="teams-list">
         </div>
+
+        <!-- Lista de sugestões automáticas baseada nas equipes cadastradas -->
+        <datalist id="teams-list">
+            <option value="Arsenal">
+            <option value="Manchester City">
+            <option value="Liverpool">
+            <option value="Chelsea">
+            <option value="Tottenham">
+            <option value="Manchester United">
+            <option value="Aston Villa">
+            <option value="Newcastle">
+            <option value="Coventry">
+            <option value="Real Madrid">
+            <option value="Barcelona">
+            <option value="Atletico Madrid">
+            <option value="Inter Milan">
+            <option value="Juventus">
+            <option value="AC Milan">
+            <option value="Bayern Munich">
+            <option value="Dortmund">
+            <option value="PSG">
+            <option value="Marseille">
+            <option value="Flamengo">
+            <option value="Palmeiras">
+            <option value="Botafogo">
+            <option value="Sao Paulo">
+            <option value="Corinthians">
+            <option value="Fluminense">
+            <option value="CRB">
+            <option value="Botafogo SP">
+            <option value="River Plate">
+            <option value="Boca Juniors">
+            <option value="Newell's Old Boys">
+            <option value="Central Córdoba">
+            <option value="Ajax">
+            <option value="PSV">
+            <option value="Feyenoord">
+            <option value="Benfica">
+            <option value="Sporting">
+            <option value="FC Porto">
+            <option value="Braga">
+            <option value="Galatasaray">
+            <option value="Fenerbahce">
+            <option value="Al Hilal">
+            <option value="Al Nassr">
+            <option value="Inter Miami">
+            <option value="LA Galaxy">
+            <option value="Celtic">
+            <option value="Rangers">
+        </datalist>
+
         <button onclick="analisarJogo()">Analisar Partida</button>
 
         <div id="history-container" style="display:none; margin-top:12px;">
