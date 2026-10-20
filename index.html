@@ -1,397 +1,373 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Correct Score Analyzer Pro</title>
+    <title>CS-Dutching | Análise de Placar Exato</title>
     <style>
         :root {
-            --bg-color: #121214;
-            --card-bg: #202024;
-            --primary: #00875f;
-            --primary-hover: #00b37e;
-            --text: #e1e1e6;
-            --text-secondary: #a8a8b3;
-            --accent: #00b37e;
-            --gold: #e5bf00;
-            --input-bg: #121214;
-            --border-color: #323238;
-            --chip-bg: #29292e;
-            --badge-bg: #121214;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --text-muted: #666666;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --border-color: #e2e8f0;
+            --input-bg: #f8fafc;
+            --table-header: #f1f5f9;
         }
 
-        [data-theme="light"] {
-            --bg-color: #f0f2f5;
-            --card-bg: #ffffff;
-            --primary: #00875f;
-            --primary-hover: #00a372;
-            --text: #121214;
-            --text-secondary: #737380;
-            --accent: #00875f;
-            --gold: #b38f00;
-            --input-bg: #f8f9fa;
-            --border-color: #dce2e6;
-            --chip-bg: #e1e1e6;
-            --badge-bg: #f8f9fa;
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --border-color: #334155;
+            --input-bg: #0f172a;
+            --table-header: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text);
-            margin: 0;
-            padding: 16px;
+            color: var(--text-color);
+            padding: 20px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: background 0.3s, color 0.3s;
+            justify-content: center;
+            min-height: 100vh;
         }
 
         .container {
             width: 100%;
-            max-width: 480px;
+            max-width: 600px;
         }
 
-        .header {
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
 
-        .header-content h1 {
-            font-size: 1.3rem;
-            color: var(--text);
-            margin: 0 0 2px 0;
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
         }
 
-        .header-content p {
-            font-size: 0.78rem;
-            color: var(--text-secondary);
-            margin: 0;
-        }
-
-        .theme-btn {
-            background: var(--card-bg);
+        .theme-toggle {
+            background: none;
             border: 1px solid var(--border-color);
-            color: var(--text);
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 8px;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-
-        .theme-btn:active {
-            transform: scale(0.9);
+            font-size: 1rem;
         }
 
         .card {
             background-color: var(--card-bg);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transition: background-color 0.3s;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        .input-group {
-            margin-bottom: 12px;
+        .form-group {
+            margin-bottom: 15px;
         }
 
         label {
             display: block;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-muted);
         }
 
         input {
             width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
+            padding: 12px;
             background-color: var(--input-bg);
-            color: var(--text);
-            box-sizing: border-box;
-            font-size: 0.95rem;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
         }
 
-        button.action-btn {
+        input:focus {
+            border-color: var(--primary);
+        }
+
+        button.btn-analisar {
             width: 100%;
             padding: 12px;
             background-color: var(--primary);
-            color: #fff;
+            color: white;
             border: none;
-            border-radius: 6px;
-            font-weight: bold;
+            border-radius: 8px;
             font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            margin-top: 5px;
         }
 
-        button.action-btn:hover {
+        button.btn-analisar:hover {
             background-color: var(--primary-hover);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            display: none;
         }
 
         .results {
             display: none;
         }
 
-        .match-info {
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-            margin-bottom: 12px;
+        .match-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .championship-name {
+            font-size: 0.9rem;
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-box {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 8px;
             text-align: center;
         }
 
-        .metrics-badge {
-            display: flex;
-            justify-content: space-around;
-            background: var(--badge-bg);
-            padding: 8px;
-            border-radius: 6px;
-            margin-top: 8px;
-            font-size: 0.78rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .value-tag {
-            display: inline-block;
-            background: #2e2800;
-            color: var(--gold);
-            border: 1px solid var(--gold);
-            padding: 4px 8px;
-            border-radius: 4px;
+        .metric-label {
             font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
             font-weight: bold;
-            margin-top: 8px;
+            margin-top: 4px;
         }
 
-        .score-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 12px;
-            background-color: var(--badge-bg);
-            border-radius: 6px;
-            margin-bottom: 8px;
-            border-left: 4px solid var(--accent);
-            border: 1px solid var(--border-color);
-            border-left-width: 4px;
+        .alert-box {
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 500;
         }
 
-        .score-title {
-            font-size: 1.05rem;
-            font-weight: bold;
-            color: var(--text);
+        .alert-warning {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
-        .score-desc {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
         }
 
-        .score-prob {
-            text-align: right;
-            font-size: 0.85rem;
-            font-weight: bold;
+        .alert-neutral {
+            background-color: rgba(59, 130, 246, 0.1);
             color: var(--primary);
+            border: 1px solid rgba(59, 130, 246, 0.2);
         }
 
-        .score-odd {
-            font-size: 0.72rem;
-            color: var(--gold);
-        }
-
-        .history-box {
+        table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 10px;
-            display: flex;
-            gap: 6px;
-            overflow-x: auto;
-            padding-bottom: 4px;
+            font-size: 0.9rem;
         }
 
-        .history-chip {
-            background: var(--chip-bg);
-            color: var(--text);
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.72rem;
-            white-space: nowrap;
-            cursor: pointer;
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .disclaimer {
-            font-size: 0.72rem;
-            color: var(--text-secondary);
-            text-align: center;
-            margin-top: 12px;
-            line-height: 1.3;
+        th {
+            background-color: var(--table-header);
+            font-weight: 600;
         }
     </style>
 </head>
-<body>
+<body data-theme="dark">
+    <div class="container">
+        <header>
+            <h1>CS-Dutching ⚽</h1>
+            <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">☀️</button>
+        </header>
 
-<div class="container">
-    <div class="header">
-        <div class="header-content">
-            <h1>Correct Score Analyzer Pro</h1>
-            <p>Análise Avançada & Dutching</p>
+        <div class="card">
+            <div class="form-group">
+                <label for="home">Equipe da Casa</label>
+                <input type="text" id="home" list="teams-list" placeholder="Ex: Flamengo">
+            </div>
+            <div class="form-group">
+                <label for="away">Equipe Visitante</label>
+                <input type="text" id="away" list="teams-list" placeholder="Ex: Palmeiras">
+            </div>
+            <datalist id="teams-list">
+                <option value="Arsenal">
+                <option value="Manchester City">
+                <option value="Real Madrid">
+                <option value="Barcelona">
+                <option value="Flamengo">
+                <option value="Palmeiras">
+                <option value="Botafogo">
+                <option value="River Plate">
+                <option value="Boca Juniors">
+            </datalist>
+            <button class="btn-analisar" onclick="analisarPartida()">Analisar Partida</button>
         </div>
-        <button class="theme-btn" id="theme-toggle" onclick="alternarTema()" title="Alternar Tema">🌙</button>
-    </div>
 
-    <div class="card">
-        <div class="input-group">
-            <label for="home">Time da Casa (Mandante)</label>
-            <input type="text" id="home" placeholder="Comece a digitar o time..." list="teams-list">
-        </div>
-        <div class="input-group">
-            <label for="away">Time Visitante (Fora)</label>
-            <input type="text" id="away" placeholder="Comece a digitar o time..." list="teams-list">
-        </div>
+        <div class="loading" id="loading">Consultando dados reais na API e calculando Poisson... ⏳</div>
 
-        <datalist id="teams-list">
-            <option value="Arsenal"><option value="Manchester City"><option value="Liverpool"><option value="Chelsea"><option value="Tottenham"><option value="Manchester United"><option value="Aston Villa"><option value="Newcastle"><option value="Coventry"><option value="Real Madrid"><option value="Barcelona"><option value="Atletico Madrid"><option value="Inter Milan"><option value="Juventus"><option value="AC Milan"><option value="Bayern Munich"><option value="Dortmund"><option value="PSG"><option value="Marseille"><option value="Flamengo"><option value="Palmeiras"><option value="Botafogo"><option value="Sao Paulo"><option value="Corinthians"><option value="Fluminense"><option value="CRB"><option value="Botafogo SP"><option value="River Plate"><option value="Boca Juniors"><option value="Newell's Old Boys"><option value="Central Córdoba"><option value="Ajax"><option value="PSV"><option value="Feyenoord"><option value="Benfica"><option value="Sporting"><option value="FC Porto"><option value="Braga"><option value="Galatasaray"><option value="Fenerbahce"><option value="Al Hilal"><option value="Al Nassr"><option value="Inter Miami"><option value="LA Galaxy"><option value="Celtic"><option value="Rangers">
-        </datalist>
-
-        <button class="action-btn" onclick="analisarJogo()">Analisar Partida</button>
-
-        <div id="history-container" style="display:none; margin-top:12px;">
-            <label>Análises Recentes:</label>
-            <div id="history-list" class="history-box"></div>
-        </div>
-    </div>
-
-    <div id="results" class="card results">
-        <div class="match-info">
-            <h2 id="match-title" style="font-size: 1.1rem; margin: 0; color: var(--text);">Aguardando...</h2>
+        <div class="card results" id="results-card">
+            <div class="match-title" id="res-match"></div>
+            <div class="championship-name" id="res-championship"></div>
             
-            <div id="metrics-panel" class="metrics-badge">
-                <span>xG: <strong id="xg-val" style="color:var(--text);">-</strong></span>
-                <span>Linha: <strong id="linha-val" style="color:var(--primary);">-</strong></span>
-                <span>Cobertura: <strong id="cob-val" style="color:var(--text);">-</strong></span>
+            <div class="alert-box" id="res-volatility"></div>
+
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <div class="metric-label">xG Esperado</div>
+                    <div class="metric-value" id="res-xg"></div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">Linha de Gols</div>
+                    <div class="metric-value" id="res-goals"></div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">Cobertura Top 5</div>
+                    <div class="metric-value" id="res-coverage"></div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">Soma Implícita</div>
+                    <div class="metric-value" id="res-implied"></div>
+                </div>
             </div>
 
-            <div id="value-alert" class="value-tag" style="display:none;">
-                ⚡ VALOR MATEMÁTICO DETECTADO NO DUTCHING
-            </div>
-        </div>
-
-        <div id="score-list"></div>
-
-        <div class="disclaimer">
-            * <strong>Formato Mercado:</strong> [Gols Casa - Gols Fora]<br>
-            Odds estimadas sem margem da casa. Stake igual em cada opção.
+            <h3 style="font-size: 1rem; margin-bottom: 8px;">Top 5 Placares (Dutching)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Placar</th>
+                        <th>Descrição</th>
+                        <th>Odd Est.</th>
+                    </tr>
+                </thead>
+                <tbody id="res-table-body">
+                </tbody>
+            </table>
         </div>
     </div>
-</div>
 
-<script>
-    // Gestão de Tema (Claro / Escuro)
-    const currentTheme = localStorage.getItem('theme') || 'dark';
-    if (currentTheme === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
-        document.getElementById('theme-toggle').innerText = '☀️';
-    }
+    <script>
+        const API_URL = "https://cs-dutching-api.onrender.com";
 
-    function alternarTema() {
-        const theme = document.documentElement.getAttribute('data-theme');
-        if (theme === 'light') {
-            document.documentElement.removeAttribute('data-theme');
-            localStorage.setItem('theme', 'dark');
-            document.getElementById('theme-toggle').innerText = '🌙';
-        } else {
-            document.documentElement.setAttribute('data-theme', 'light');
-            localStorage.setItem('theme', 'light');
-            document.getElementById('theme-toggle').innerText = '☀️';
-        }
-    }
-
-    let historicoJogos = [];
-
-    async function analisarJogo(homeOpt = null, awayOpt = null) {
-        const home = homeOpt || document.getElementById('home').value;
-        const away = awayOpt || document.getElementById('away').value;
-
-        if (!home || !away) {
-            alert('Por favor, informe os dois times!');
-            return;
+        // Gerenciamento de Tema
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute("data-theme");
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+            body.setAttribute("data-theme", newTheme);
+            document.getElementById("theme-btn").innerText = newTheme === "dark" ? "☀️" : "🌙";
+            localStorage.setItem("theme", newTheme);
         }
 
-        document.getElementById('home').value = home;
-        document.getElementById('away').value = away;
+        window.addEventListener("DOMContentLoaded", () => {
+            const savedTheme = localStorage.getItem("theme") || "dark";
+            document.body.setAttribute("data-theme", savedTheme);
+            document.getElementById("theme-btn").innerText = savedTheme === "dark" ? "☀️" : "🌙";
+        });
 
-        document.getElementById('results').style.display = 'block';
-        document.getElementById('match-title').innerText = 'Cruzando estatísticas recentes e H2H...';
-        document.getElementById('value-alert').style.display = 'none';
-        document.getElementById('score-list').innerHTML = '<p style="text-align:center; color:var(--text-secondary); padding:10px;">Calculando probabilidades...</p>';
+        async function analisarPartida() {
+            const home = document.getElementById("home").value.trim();
+            const away = document.getElementById("away").value.trim();
 
-        try {
-            const urlAPI = `https://cs-dutching-api.onrender.com/analisar?home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}`;
-            const response = await fetch(urlAPI);
-            const data = await response.json();
-
-            document.getElementById('match-title').innerText = data.partida;
-            document.getElementById('xg-val').innerText = `${data.xg_casa} x ${data.xg_fora}`;
-            document.getElementById('linha-val').innerText = data.linha_gols;
-            document.getElementById('cob-val').innerText = `${data.cobertura}%`;
-
-            if (data.tem_valor_dutching) {
-                document.getElementById('value-alert').style.display = 'inline-block';
+            if (!home || !away) {
+                alert("Por favor, preencha os nomes das duas equipes.");
+                return;
             }
 
-            const scoreListDiv = document.getElementById('score-list');
-            scoreListDiv.innerHTML = '';
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("results-card").style.display = "none";
 
-            data.top_5.forEach((item, index) => {
-                scoreListDiv.innerHTML += `
-                    <div class="score-row">
-                        <div>
-                            <div class="score-title">${index + 1}º &nbsp; [ ${item.placar} ]</div>
-                            <div class="score-desc">${item.descricao}</div>
-                        </div>
-                        <div class="score-prob">
-                            ${(item.probabilidade * 100).toFixed(1)}%
-                            <div class="score-odd">Odd Média ~ @${item.odd_estimada.toFixed(2)}</div>
-                        </div>
-                    </div>
-                `;
-            });
+            try {
+                const response = await fetch(`${API_URL}/analisar?home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}`);
+                const data = await response.json();
 
-            salvarHistorico(home, away);
+                if (response.ok) {
+                    document.getElementById("res-match").innerText = data.partida;
+                    document.getElementById("res-championship").innerText = "🏆 " + (data.campeonato || "Competição Geral");
+                    document.getElementById("res-xg").innerText = `${data.xg_casa} - ${data.xg_fora}`;
+                    document.getElementById("res-goals").innerText = data.linha_gols;
+                    document.getElementById("res-coverage").innerText = `${data.cobertura}%`;
+                    document.getElementById("res-implied").innerText = data.soma_implicita;
 
-        } catch (err) {
-            document.getElementById('match-title').innerText = 'Erro ao consultar';
-            document.getElementById('score-list').innerHTML = '<p style="text-align:center; color:#ff5555;">Servidor em aquecimento. Tente novamente em 20 segundos.</p>';
+                    // Alerta de volatilidade
+                    const alertBox = document.getElementById("res-volatility");
+                    alertBox.innerText = data.alerta_volatilidade;
+                    alertBox.className = "alert-box " + (data.cobertura < 40 ? "alert-warning" : (data.cobertura >= 55 ? "alert-success" : "alert-neutral"));
+
+                    // Tabela Top 5
+                    const tbody = document.getElementById("res-table-body");
+                    tbody.innerHTML = "";
+                    data.top_5.forEach(item => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td><strong>${item.placar}</strong></td>
+                            <td>${item.descricao}</td>
+                            <td>${item.odd_estimada}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+
+                    document.getElementById("results-card").style.display = "block";
+                } else {
+                    alert("Erro ao processar a análise no servidor.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Erro de conexão com a API no Render.");
+            } finally {
+                document.getElementById("loading").style.display = "none";
+            }
         }
-    }
-
-    function salvarHistorico(h, a) {
-        const itemStr = `${h} x ${a}`;
-        if (!historicoJogos.includes(itemStr)) {
-            historicoJogos.unshift(itemStr);
-            if (historicoJogos.length > 5) historicoJogos.pop();
-            atualizarBarraHistorico();
-        }
-    }
-
-    function atualizarBarraHistorico() {
-        const listDiv = document.getElementById('history-list');
-        listDiv.innerHTML = '';
-        historicoJogos.forEach(item => {
-            const parts = item.split(' x ');
-            listDiv.innerHTML += `<div class="history-chip" onclick="analisarJogo('${parts[0]}', '${parts[1]}')">${item}</div>`;
-        });
-        document.getElementById('history-container').style.display = 'block';
-    }
-</script>
-
+    </script>
 </body>
 </html>
