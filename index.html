@@ -14,6 +14,25 @@
             --text-secondary: #a8a8b3;
             --accent: #00b37e;
             --gold: #e5bf00;
+            --input-bg: #121214;
+            --border-color: #323238;
+            --chip-bg: #29292e;
+            --badge-bg: #121214;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --primary: #00875f;
+            --primary-hover: #00a372;
+            --text: #121214;
+            --text-secondary: #737380;
+            --accent: #00875f;
+            --gold: #b38f00;
+            --input-bg: #f8f9fa;
+            --border-color: #dce2e6;
+            --chip-bg: #e1e1e6;
+            --badge-bg: #f8f9fa;
         }
 
         body {
@@ -25,6 +44,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: background 0.3s, color 0.3s;
         }
 
         .container {
@@ -33,20 +53,42 @@
         }
 
         .header {
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
         }
 
-        .header h1 {
-            font-size: 1.4rem;
-            color: #fff;
-            margin: 0 0 4px 0;
+        .header-content h1 {
+            font-size: 1.3rem;
+            color: var(--text);
+            margin: 0 0 2px 0;
         }
 
-        .header p {
-            font-size: 0.8rem;
+        .header-content p {
+            font-size: 0.78rem;
             color: var(--text-secondary);
             margin: 0;
+        }
+
+        .theme-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .theme-btn:active {
+            transform: scale(0.9);
         }
 
         .card {
@@ -54,7 +96,8 @@
             border-radius: 8px;
             padding: 16px;
             margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: background-color 0.3s;
         }
 
         .input-group {
@@ -72,14 +115,14 @@
             width: 100%;
             padding: 10px;
             border-radius: 6px;
-            border: 1px solid #323238;
-            background-color: #121214;
-            color: #fff;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text);
             box-sizing: border-box;
             font-size: 0.95rem;
         }
 
-        button {
+        button.action-btn {
             width: 100%;
             padding: 12px;
             background-color: var(--primary);
@@ -92,7 +135,7 @@
             transition: background 0.2s;
         }
 
-        button:hover {
+        button.action-btn:hover {
             background-color: var(--primary-hover);
         }
 
@@ -101,7 +144,7 @@
         }
 
         .match-info {
-            border-bottom: 1px solid #323238;
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 10px;
             margin-bottom: 12px;
             text-align: center;
@@ -110,11 +153,12 @@
         .metrics-badge {
             display: flex;
             justify-content: space-around;
-            background: #121214;
+            background: var(--badge-bg);
             padding: 8px;
             border-radius: 6px;
             margin-top: 8px;
             font-size: 0.78rem;
+            border: 1px solid var(--border-color);
         }
 
         .value-tag {
@@ -134,16 +178,18 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 12px;
-            background-color: #121214;
+            background-color: var(--badge-bg);
             border-radius: 6px;
             margin-bottom: 8px;
             border-left: 4px solid var(--accent);
+            border: 1px solid var(--border-color);
+            border-left-width: 4px;
         }
 
         .score-title {
             font-size: 1.05rem;
             font-weight: bold;
-            color: #fff;
+            color: var(--text);
         }
 
         .score-desc {
@@ -155,7 +201,7 @@
             text-align: right;
             font-size: 0.85rem;
             font-weight: bold;
-            color: #00b37e;
+            color: var(--primary);
         }
 
         .score-odd {
@@ -172,8 +218,8 @@
         }
 
         .history-chip {
-            background: #29292e;
-            color: #a8a8b3;
+            background: var(--chip-bg);
+            color: var(--text);
             padding: 4px 8px;
             border-radius: 12px;
             font-size: 0.72rem;
@@ -183,7 +229,7 @@
 
         .disclaimer {
             font-size: 0.72rem;
-            color: #8d8d99;
+            color: var(--text-secondary);
             text-align: center;
             margin-top: 12px;
             line-height: 1.3;
@@ -194,8 +240,11 @@
 
 <div class="container">
     <div class="header">
-        <h1>Correct Score Analyzer Pro</h1>
-        <p>Análise Avançada & Dutching para Correct Score</p>
+        <div class="header-content">
+            <h1>Correct Score Analyzer Pro</h1>
+            <p>Análise Avançada & Dutching</p>
+        </div>
+        <button class="theme-btn" id="theme-toggle" onclick="alternarTema()" title="Alternar Tema">🌙</button>
     </div>
 
     <div class="card">
@@ -208,57 +257,11 @@
             <input type="text" id="away" placeholder="Comece a digitar o time..." list="teams-list">
         </div>
 
-        <!-- Lista de sugestões automáticas baseada nas equipes cadastradas -->
         <datalist id="teams-list">
-            <option value="Arsenal">
-            <option value="Manchester City">
-            <option value="Liverpool">
-            <option value="Chelsea">
-            <option value="Tottenham">
-            <option value="Manchester United">
-            <option value="Aston Villa">
-            <option value="Newcastle">
-            <option value="Coventry">
-            <option value="Real Madrid">
-            <option value="Barcelona">
-            <option value="Atletico Madrid">
-            <option value="Inter Milan">
-            <option value="Juventus">
-            <option value="AC Milan">
-            <option value="Bayern Munich">
-            <option value="Dortmund">
-            <option value="PSG">
-            <option value="Marseille">
-            <option value="Flamengo">
-            <option value="Palmeiras">
-            <option value="Botafogo">
-            <option value="Sao Paulo">
-            <option value="Corinthians">
-            <option value="Fluminense">
-            <option value="CRB">
-            <option value="Botafogo SP">
-            <option value="River Plate">
-            <option value="Boca Juniors">
-            <option value="Newell's Old Boys">
-            <option value="Central Córdoba">
-            <option value="Ajax">
-            <option value="PSV">
-            <option value="Feyenoord">
-            <option value="Benfica">
-            <option value="Sporting">
-            <option value="FC Porto">
-            <option value="Braga">
-            <option value="Galatasaray">
-            <option value="Fenerbahce">
-            <option value="Al Hilal">
-            <option value="Al Nassr">
-            <option value="Inter Miami">
-            <option value="LA Galaxy">
-            <option value="Celtic">
-            <option value="Rangers">
+            <option value="Arsenal"><option value="Manchester City"><option value="Liverpool"><option value="Chelsea"><option value="Tottenham"><option value="Manchester United"><option value="Aston Villa"><option value="Newcastle"><option value="Coventry"><option value="Real Madrid"><option value="Barcelona"><option value="Atletico Madrid"><option value="Inter Milan"><option value="Juventus"><option value="AC Milan"><option value="Bayern Munich"><option value="Dortmund"><option value="PSG"><option value="Marseille"><option value="Flamengo"><option value="Palmeiras"><option value="Botafogo"><option value="Sao Paulo"><option value="Corinthians"><option value="Fluminense"><option value="CRB"><option value="Botafogo SP"><option value="River Plate"><option value="Boca Juniors"><option value="Newell's Old Boys"><option value="Central Córdoba"><option value="Ajax"><option value="PSV"><option value="Feyenoord"><option value="Benfica"><option value="Sporting"><option value="FC Porto"><option value="Braga"><option value="Galatasaray"><option value="Fenerbahce"><option value="Al Hilal"><option value="Al Nassr"><option value="Inter Miami"><option value="LA Galaxy"><option value="Celtic"><option value="Rangers">
         </datalist>
 
-        <button onclick="analisarJogo()">Analisar Partida</button>
+        <button class="action-btn" onclick="analisarJogo()">Analisar Partida</button>
 
         <div id="history-container" style="display:none; margin-top:12px;">
             <label>Análises Recentes:</label>
@@ -268,12 +271,12 @@
 
     <div id="results" class="card results">
         <div class="match-info">
-            <h2 id="match-title" style="font-size: 1.1rem; margin: 0; color: #fff;">Aguardando...</h2>
+            <h2 id="match-title" style="font-size: 1.1rem; margin: 0; color: var(--text);">Aguardando...</h2>
             
             <div id="metrics-panel" class="metrics-badge">
-                <span>xG: <strong id="xg-val" style="color:#fff;">-</strong></span>
-                <span>Linha: <strong id="linha-val" style="color:#00b37e;">-</strong></span>
-                <span>Cobertura: <strong id="cob-val" style="color:#fff;">-</strong></span>
+                <span>xG: <strong id="xg-val" style="color:var(--text);">-</strong></span>
+                <span>Linha: <strong id="linha-val" style="color:var(--primary);">-</strong></span>
+                <span>Cobertura: <strong id="cob-val" style="color:var(--text);">-</strong></span>
             </div>
 
             <div id="value-alert" class="value-tag" style="display:none;">
@@ -291,6 +294,26 @@
 </div>
 
 <script>
+    // Gestão de Tema (Claro / Escuro)
+    const currentTheme = localStorage.getItem('theme') || 'dark';
+    if (currentTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        document.getElementById('theme-toggle').innerText = '☀️';
+    }
+
+    function alternarTema() {
+        const theme = document.documentElement.getAttribute('data-theme');
+        if (theme === 'light') {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'dark');
+            document.getElementById('theme-toggle').innerText = '🌙';
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+            document.getElementById('theme-toggle').innerText = '☀️';
+        }
+    }
+
     let historicoJogos = [];
 
     async function analisarJogo(homeOpt = null, awayOpt = null) {
@@ -308,7 +331,7 @@
         document.getElementById('results').style.display = 'block';
         document.getElementById('match-title').innerText = 'Cruzando estatísticas recentes e H2H...';
         document.getElementById('value-alert').style.display = 'none';
-        document.getElementById('score-list').innerHTML = '<p style="text-align:center; color:#a8a8b3; padding:10px;">Calculando probabilidades...</p>';
+        document.getElementById('score-list').innerHTML = '<p style="text-align:center; color:var(--text-secondary); padding:10px;">Calculando probabilidades...</p>';
 
         try {
             const urlAPI = `https://cs-dutching-api.onrender.com/analisar?home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}`;
