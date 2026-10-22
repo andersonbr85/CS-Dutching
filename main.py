@@ -126,6 +126,7 @@ def analisar(home: str, away: str):
     
     cobertura_percentual = float(round(soma_prob * 100, 1))
     
+    # --- LÓGICA DO FILTRO DE VOLATILIDADE (OPÇÃO 4) ---
     if cobertura_percentual < 40.0:
         alerta_volatilidade = "⚠️ Alerta: Jogo de Alta Volatilidade (Risco Elevado para Dutching)"
     elif cobertura_percentual >= 55.0:
