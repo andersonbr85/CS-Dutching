@@ -118,43 +118,20 @@ def analisar(home: str, away: str):
                 "odd_estimada": odd_estimada
             })
             
-    # Ordenar por maior probabilidade pura
+    # Ordenar por maior probabilidade pura de Poisson
     placares_ordenados = sorted(placares, key=lambda x: x["probabilidade"], reverse=True)
     
-    # Detetar se o jogo tem um favorito claro ou é equilibrado
-    diferenca_xg = abs(xg_casa - xg_fora)
-    is_equilibrado = diferenca_xg < 0.45
+    # --- ESTRATÉGIA: 1 ALVO PRINCIPAL + 4 PLACARES DE RESPALDO ---
+    alvo_principal = placares_ordenados[0]
+    alvo_principal["descricao"] += " (🎯 Alvo Principal)"
     
-    top_4 = placares_ordenados[:4]
-    placares_ja_inclusos = {p["placar"] for p in top_4}
-    
-    quinto_placar = None
-    
-    if not is_equilibrado:
-        # Cenário de FAVORITO: O 5º placar procura uma proteção de margem elástica (ex: zebra a marcar 2 golos ou goleada)
-        for item in placares_ordenados[4:]:
-            gc, gf = map(int, item["placar"].split(" - "))
-            if abs(gc - gf) >= 2 or (gc + gf) >= 3:
-                if item["placar"] not in placares_ja_inclusos:
-                    item["descricao"] += " (🛡️ Proteção de Margem)"
-                    quinto_placar = item
-                    break
-    else:
-        # Cenário EQUILIBRADO: O 5º placar procura simetria e cobertura para jogos abertos (ex: 2-2 ou variação cruzada)
-        for item in placares_ordenados[4:]:
-            gc, gf = map(int, item["placar"].split(" - "))
-            if gc == gf or abs(gc - gf) == 1:
-                if item["placar"] not in placares_ja_inclusos:
-                    item["descricao"] += " (🛡️ Proteção de Simetria)"
-                    quinto_placar = item
-                    break
-                    
-    # Fallback caso não encaixe na regra específica
-    if not quinto_placar:
-        quinto_placar = placares_ordenados[4]
-        quinto_placar["descricao"] += " (🛡️ Proteção)"
-        
-    top_5 = top_4 + [quinto_placar]
+    respaldos = []
+    for item in placares_ordenados[1:]:
+        if len(respaldos) < 4:
+            item["descricao"] += " (🛡️ Respaldo de Proteção)"
+            respaldos.append(item)
+            
+    top_5 = [alvo_principal] + respaldos
     
     soma_implicita = sum(1 / p["odd_estimada"] for p in top_5)
     tem_valor_dutching = bool(soma_implicita < 0.95)
