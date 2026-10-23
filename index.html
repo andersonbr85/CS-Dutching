@@ -1,369 +1,380 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS-Dutching | Análise de Placar Exato</title>
+    <title>Dutching Pro - Exact Score</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f4f6f9;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --text-muted: #666666;
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --border-color: #e2e8f0;
-            --input-bg: #f8fafc;
-            --table-header: #f1f5f9;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #090d16 100%);
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --accent-target: #f59e0b;
+            --accent-support: #3b82f6;
+            --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --primary: #3b82f6;
-            --primary-hover: #2563eb;
-            --border-color: #334155;
-            --input-bg: #0f172a;
-            --table-header: #334155;
+            --shadow-3d: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+            --inner-glow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 20px;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            min-height: 100vh;
+            align-items: center;
+            padding: 20px;
         }
 
         .container {
             width: 100%;
-            max-width: 600px;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+            max-width: 480px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: var(--shadow-3d), var(--inner-glow);
         }
 
         h1 {
             font-size: 1.5rem;
-            font-weight: 700;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 4px;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
         }
 
-        .theme-toggle {
-            background: none;
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 24px;
         }
 
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-
-        .form-group {
-            margin-bottom: 15px;
+        .input-group {
+            margin-bottom: 16px;
         }
 
         label {
             display: block;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             color: var(--text-muted);
+            margin-bottom: 6px;
         }
 
         input {
             width: 100%;
-            padding: 12px;
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            border-radius: 8px;
-            font-size: 1rem;
+            padding: 14px 16px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            color: var(--text-main);
+            font-size: 0.95krem;
             outline: none;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         input:focus {
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        button.btn-analisar {
+        button {
             width: 100%;
-            padding: 12px;
-            background-color: var(--primary);
+            padding: 16px;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 14px;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            margin-top: 5px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            margin-top: 8px;
         }
 
-        button.btn-analisar:hover {
-            background-color: var(--primary-hover);
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        #resultado {
+            margin-top: 24px;
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .match-header {
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 16px;
+            border: 1px solid var(--card-border);
+            text-align: center;
+        }
+
+        .match-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .league-name {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .stat-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .alert-box {
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .alert-good {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+        }
+
+        .alert-bad {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+
+        .placar-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .placar-card:hover {
+            transform: scale(1.02);
+        }
+
+        /* Efeito 3D especial para o Alvo Principal */
+        .placar-card.alvo-principal {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            box-shadow: 0 6px 15px rgba(245, 158, 11, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .placar-info .score {
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .placar-info .desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .placar-odds {
+            text-align: right;
+        }
+
+        .placar-odds .odd {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #818cf8;
+        }
+
+        .placar-odds .prob {
+            font-size: 0.7rem;
+            color: var(--text-muted);
         }
 
         .loading {
             text-align: center;
-            padding: 20px;
             color: var(--text-muted);
-            display: none;
-        }
-
-        .results {
-            display: none;
-        }
-
-        .match-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 4px;
-        }
-
-        .championship-name {
-            font-size: 0.95rem;
-            text-align: center;
-            color: var(--primary);
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .metric-box {
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .metric-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .metric-value {
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-top: 4px;
-        }
-
-        .alert-box {
-            padding: 10px;
-            border-radius: 8px;
             font-size: 0.9rem;
-            text-align: center;
-            margin-bottom: 15px;
-            font-weight: 500;
-        }
-
-        .alert-warning {
-            background-color: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-
-        .alert-success {
-            background-color: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .alert-neutral {
-            background-color: rgba(59, 130, 246, 0.1);
-            color: var(--primary);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            font-size: 0.9rem;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        th {
-            background-color: var(--table-header);
-            font-weight: 600;
+            margin-top: 16px;
+            display: none;
         }
     </style>
 </head>
-<body data-theme="dark">
-    <div class="container">
-        <header>
-            <h1>CS-Dutching ⚽</h1>
-            <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">☀️</button>
-        </header>
+<body>
 
-        <div class="card">
-            <div class="form-group">
-                <label for="home">Equipe da Casa</label>
-                <input type="text" id="home" list="teams-list" placeholder="Ex: Flamengo">
-            </div>
-            <div class="form-group">
-                <label for="away">Equipe Visitante</label>
-                <input type="text" id="away" list="teams-list" placeholder="Ex: Palmeiras">
-            </div>
-            <datalist id="teams-list">
-                <option value="Arsenal">
-                <option value="Manchester City">
-                <option value="Real Madrid">
-                <option value="Barcelona">
-                <option value="Flamengo">
-                <option value="Palmeiras">
-                <option value="Botafogo">
-                <option value="River Plate">
-                <option value="Boca Juniors">
-            </datalist>
-            <button class="btn-analisar" onclick="analisarPartida()">Analisar Partida</button>
+    <div class="container">
+        <h1>Dutching Pro</h1>
+        <p class="subtitle">Análise Estatística & Alvo Exato</p>
+
+        <div class="input-group">
+            <label for="home">Equipe da Casa</label>
+            <input type="text" id="home" placeholder="Ex: Real Madrid">
         </div>
 
-        <div class="loading" id="loading">Consultando dados reais na API e calculando Poisson... ⏳</div>
+        <div class="input-group">
+            <label for="away">Equipe Visitante</label>
+            <input type="text" id="away" placeholder="Ex: Barcelona">
+        </div>
 
-        <div class="card results" id="results-card">
-            <div class="match-title" id="res-match"></div>
-            <div class="championship-name" id="res-championship"></div>
-            
-            <div class="alert-box" id="res-volatility"></div>
+        <button onclick="analisarPartida()">Analisar Confronto</button>
 
-            <div class="metrics-grid">
-                <div class="metric-box">
-                    <div class="metric-label">xG Esperado</div>
-                    <div class="metric-value" id="res-xg"></div>
+        <div id="loading" class="loading">A processar dados e calcular Poisson...</div>
+
+        <div id="resultado">
+            <div class="match-header">
+                <div class="league-name" id="res-liga">-</div>
+                <div class="match-title" id="res-partida">-</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">xG Casa</div>
+                    <div class="stat-value" id="res-xg-casa">-</div>
                 </div>
-                <div class="metric-box">
-                    <div class="metric-label">Linha de Gols</div>
-                    <div class="metric-value" id="res-goals"></div>
+                <div class="stat-card">
+                    <div class="stat-label">xG Fora</div>
+                    <div class="stat-value" id="res-xg-fora">-</div>
                 </div>
-                <div class="metric-box">
-                    <div class="metric-label">Cobertura Top 5</div>
-                    <div class="metric-value" id="res-coverage"></div>
-                </div>
-                <div class="metric-box">
-                    <div class="metric-label">Soma Implícita</div>
-                    <div class="metric-value" id="res-implied"></div>
+                <div class="stat-card">
+                    <div class="stat-label">Linha de Gols</div>
+                    <div class="stat-value" id="res-linha" style="font-size: 0.8rem;">-</div>
                 </div>
             </div>
 
-            <h3 style="font-size: 1rem; margin-bottom: 8px;">Top 5 Placares (Dutching)</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Placar</th>
-                        <th>Descrição</th>
-                        <th>Odd Est.</th>
-                    </tr>
-                </thead>
-                <tbody id="res-table-body">
-                </tbody>
-            </table>
+            <div id="res-alerta" class="alert-box">-</div>
+
+            <div id="lista-placares">
+                <!-- Os placares gerados entram aqui -->
+            </div>
         </div>
     </div>
 
     <script>
-        const API_URL = "https://cs-dutching-api.onrender.com";
-
-        function toggleTheme() {
-            const body = document.body;
-            const currentTheme = body.getAttribute("data-theme");
-            const newTheme = currentTheme === "dark" ? "light" : "dark";
-            body.setAttribute("data-theme", newTheme);
-            document.getElementById("theme-btn").innerText = newTheme === "dark" ? "☀️" : "🌙";
-            localStorage.setItem("theme", newTheme);
-        }
-
-        window.addEventListener("DOMContentLoaded", () => {
-            const savedTheme = localStorage.getItem("theme") || "dark";
-            document.body.setAttribute("data-theme", savedTheme);
-            document.getElementById("theme-btn").innerText = savedTheme === "dark" ? "☀️" : "🌙";
-        });
-
         async function analisarPartida() {
-            const home = document.getElementById("home").value.trim();
-            const away = document.getElementById("away").value.trim();
+            const home = document.getElementById('home').value.trim();
+            const away = document.getElementById('away').value.trim();
+            const btnCarregando = document.getElementById('loading');
+            const divResultado = document.getElementById('resultado');
 
             if (!home || !away) {
-                alert("Por favor, preencha os nomes das duas equipes.");
+                alert('Por favor, preencha os nomes das duas equipas.');
                 return;
             }
 
-            document.getElementById("loading").style.display = "block";
-            document.getElementById("results-card").style.display = "none";
+            btnCarregando.style.display = 'block';
+            divResultado.style.display = 'none';
+
+            // URL DA SUA API NO RENDER (substitua se o seu link for diferente)
+            const apiUrl = `https://cs-dutching-api.onrender.com/analisar?home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}`;
 
             try {
-                const response = await fetch(`${API_URL}/analisar?home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}`);
+                const response = await fetch(apiUrl);
                 const data = await response.json();
 
-                if (response.ok) {
-                    document.getElementById("res-match").innerText = data.partida;
-                    document.getElementById("res-championship").innerText = "🏆 " + (data.campeonato || "Competição Geral");
-                    document.getElementById("res-xg").innerText = `${data.xg_casa} - ${data.xg_fora}`;
-                    document.getElementById("res-goals").innerText = data.linha_gols;
-                    document.getElementById("res-coverage").innerText = `${data.cobertura}%`;
-                    document.getElementById("res-implied").innerText = data.soma_implicita;
+                document.getElementById('res-liga').innerText = data.campeonato;
+                document.getElementById('res-partida').innerText = data.partida;
+                document.getElementById('res-xg-casa').innerText = data.xg_casa;
+                document.getElementById('res-xg-fora').innerText = data.xg_fora;
+                document.getElementById('res-linha').innerText = data.linha_gols;
 
-                    const alertBox = document.getElementById("res-volatility");
-                    alertBox.innerText = data.alerta_volatilidade;
-                    alertBox.className = "alert-box " + (data.cobertura < 40 ? "alert-warning" : (data.cobertura >= 55 ? "alert-success" : "alert-neutral"));
-
-                    const tbody = document.getElementById("res-table-body");
-                    tbody.innerHTML = "";
-                    data.top_5.forEach(item => {
-                        const tr = document.createElement("tr");
-                        tr.innerHTML = `
-                            <td><strong>${item.placar}</strong></td>
-                            <td>${item.descricao}</td>
-                            <td>${item.odd_estimada}</td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-
-                    document.getElementById("results-card").style.display = "block";
+                const caixaAlerta = document.getElementById('res-alerta');
+                caixaAlerta.innerText = data.alerta_volatilidade;
+                if (data.cobertura >= 55.0) {
+                    caixaAlerta.className = "alert-box alert-good";
                 } else {
-                    alert("Erro ao processar a análise no servidor.");
+                    caixaAlerta.className = "alert-box alert-bad";
                 }
+
+                let htmlPlacares = '';
+                data.top_5.forEach((p, index) => {
+                    const isAlvo = index === 0;
+                    const classeCard = isAlvo ? "placar-card alvo-principal" : "placar-card";
+                    const probabilidadePct = (p.probabilidade * 100).toFixed(1) + '%';
+
+                    htmlPlacares += `
+                        <div class="${classeCard}">
+                            <div class="placar-info">
+                                <div class="score">${p.placar}</div>
+                                <div class="desc">${p.descricao}</div>
+                            </div>
+                            <div class="placar-odds">
+                                <div class="odd">@${p.odd_estimada}</div>
+                                <div class="prob">${probabilidadePct}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('lista-placares').innerHTML = htmlPlacares;
+                divResultado.style.display = 'block';
             } catch (error) {
+                alert('Erro ao conectar com a API no Render. Verifique se o servidor está ativo.');
                 console.error(error);
-                alert("Erro de conexão com a API no Render.");
             } finally {
-                document.getElementById("loading").style.display = "none";
+                btnCarregando.style.display = 'none';
             }
         }
     </script>
