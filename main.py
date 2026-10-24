@@ -100,7 +100,8 @@ def analisar(home: str, away: str):
         linha_gols = "Equilibrado (2.5)"
     
     max_gols = 5
-    placares = []
+    placares_dict = {}
+    placares_lista = []
     
     for c in range(max_gols + 1):
         for f in range(max_gols + 1):
@@ -111,26 +112,70 @@ def analisar(home: str, away: str):
             desc = "Casa vence" if c > f else ("Visitante vence" if f > c else "Empate")
             odd_estimada = float(round(1 / prob_total, 2)) if prob_total > 0 else 99.0
             
-            placares.append({
+            item = {
                 "placar": f"{c} - {f}",
+                "c": c,
+                "f": f,
                 "descricao": desc,
                 "probabilidade": float(prob_total),
                 "odd_estimada": odd_estimada
-            })
+            }
+            placares_dict[(c, f)] = item
+            placares_lista.append(item)
             
-    # Ordenar por maior probabilidade pura de Poisson
-    placares_ordenados = sorted(placares, key=lambda x: x["probabilidade"], reverse=True)
+    # 1. Identificar o Alvo Principal (Maior Probabilidade)
+    placares_ordenados = sorted(placares_lista, key=lambda x: x["probabilidade"], reverse=True)
+    alvo = placares_ordenados[0]
+    alvo_c, alvo_f = alvo["c"], alvo["f"]
     
-    # --- ESTRATÉGIA: 1 ALVO PRINCIPAL + 4 PLACARES DE RESPALDO ---
-    alvo_principal = placares_ordenados[0]
-    alvo_principal["descricao"] += " (🎯 Alvo Principal)"
+    alvo_principal = {
+        "placar": alvo["placar"],
+        "descricao": alvo["descricao"] + " (🎯 Alvo Principal)",
+        "probabilidade": alvo["probabilidade"],
+        "odd_estimada": alvo["odd_estimada"]
+    }
+    
+    # 2. Definir Candidatos da Vizinhança Direta (+1 ou -1 gol ao redor do Alvo)
+    vizinhos_candidatos = []
+    
+    desvios = [
+        (-1, 0), (1, 0), (0, -1), (0, 1), # Vizinhança direta (+-1 gol)
+        (-1, -1), (1, 1), (-1, 1), (1, -1) # Vizinhança diagonal (jogos abertos/truncados)
+    ]
+    
+    for dc, df in desvios:
+        nc, nf = alvo_c + dc, alvo_f + df
+        if (nc, nf) in placares_dict and nc >= 0 and nf >= 0:
+            vizinhos_candidatos.append(placares_dict[(nc, nf)])
+            
+    # Ordenar vizinhos por probabilidade para pegar os 4 melhores que cercam o alvo
+    vizinhos_ordenados = sorted(vizinhos_candidatos, key=lambda x: x["probabilidade"], reverse=True)
     
     respaldos = []
-    for item in placares_ordenados[1:]:
-        if len(respaldos) < 4:
-            item["descricao"] += " (🛡️ Respaldo de Proteção)"
-            respaldos.append(item)
+    placares_usados = {alvo["placar"]}
+    
+    for v in vizinhos_ordenados:
+        if v["placar"] not in placares_usados and len(respaldos) < 4:
+            respaldos.append({
+                "placar": v["placar"],
+                "descricao": v["descricao"] + " (🛡️ Respaldo de Vizinhança)",
+                "probabilidade": v["probabilidade"],
+                "odd_estimada": v["odd_estimada"]
+            })
+            placares_usados.add(v["placar"])
             
+    # Fallback caso a vizinhança não preencha 4 placares (ex: se o alvo for 0-0 de canto)
+    if len(respaldos) < 4:
+        for item in placares_ordenados:
+            if item["placar"] not in placares_usados and len(respaldos) < 4:
+                respaldos.append({
+                    "placar": item["placar"],
+                    "descricao": item["descricao"] + " (🛡️ Respaldo)",
+                    "probabilidade": item["probabilidade"],
+                    "odd_estimada": item["odd_estimada"]
+                })
+                placares_usados.add(item["placar"])
+                
     top_5 = [alvo_principal] + respaldos
     
     soma_implicita = sum(1 / p["odd_estimada"] for p in top_5)
