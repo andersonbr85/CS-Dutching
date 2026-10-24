@@ -17,21 +17,31 @@ API_KEY = "B7ae21f7f0e5920369e6cd9e7bc63ccc"
 BASE_URL = "https://v3.football.api-sports.io"
 
 def buscar_estatisticas_e_liga(time_nome: str):
-    headers = {"x-apisports-key": API_KEY}
+    headers = {
+        "x-apisports-key": API_KEY,
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    }
     liga_nome = "Competição Geral"
     query = time_nome.strip()
     
     try:
         url_busca = f"{BASE_URL}/teams?search={query}"
-        response = requests.get(url_busca, headers=headers, timeout=5)
+        response = requests.get(url_busca, headers=headers, timeout=8)
+        
+        print(f"API Search status para '{query}': {response.status_code}")
         
         if response.status_code == 200:
             data = response.json()
             teams = data.get("response", [])
+            
             if teams:
                 team_id = teams[0].get("team", {}).get("id")
+                print(f"Equipa encontrada: {teams[0].get('team', {}).get('name')} (ID: {team_id})")
+                
                 url_fixtures = f"{BASE_URL}/fixtures?team={team_id}&last=10&status=FT"
-                res_fixtures = requests.get(url_fixtures, headers=headers, timeout=5)
+                res_fixtures = requests.get(url_fixtures, headers=headers, timeout=8)
+                
+                print(f"API Fixtures status: {res_fixtures.status_code}")
                 
                 if res_fixtures.status_code == 200:
                     fixtures_data = res_fixtures.json().get("response", [])
@@ -63,12 +73,18 @@ def buscar_estatisticas_e_liga(time_nome: str):
                             "forma": 1.05,
                             "liga": liga_nome
                         }
-                        
+            else:
+                print(f"Nenhuma equipa encontrada para a busca: '{query}'")
+        else:
+            print(f"Erro na resposta da API: {response.text}")
+
         hash_nome = sum(ord(c) for c in query)
         ataque_var = float(round(1.0 + (hash_nome % 50) / 100.0, 2))
         defesa_var = float(round(1.0 + ((hash_nome * 3) % 45) / 100.0, 2))
         return {"ataque": ataque_var, "defesa": defesa_var, "forma": 1.00, "liga": "Busca Personalizada"}
-    except Exception:
+        
+    except Exception as e:
+        print(f"Exceção ao conectar com a API: {str(e)}")
         return {"ataque": 1.25, "defesa": 1.15, "forma": 1.00, "liga": "Competição Geral"}
 
 def calcular_xg_real(time_casa: str, time_fora: str):
@@ -123,7 +139,6 @@ def analisar(home: str, away: str):
             placares_dict[(c, f)] = item
             placares_lista.append(item)
             
-    # 1. Identificar o Alvo Principal (Maior Probabilidade)
     placares_ordenados = sorted(placares_lista, key=lambda x: x["probabilidade"], reverse=True)
     alvo = placares_ordenados[0]
     alvo_c, alvo_f = alvo["c"], alvo["f"]
@@ -135,12 +150,10 @@ def analisar(home: str, away: str):
         "odd_estimada": alvo["odd_estimada"]
     }
     
-    # 2. Definir Candidatos da Vizinhança Direta (+1 ou -1 gol ao redor do Alvo)
     vizinhos_candidatos = []
-    
     desvios = [
-        (-1, 0), (1, 0), (0, -1), (0, 1), # Vizinhança direta (+-1 gol)
-        (-1, -1), (1, 1), (-1, 1), (1, -1) # Vizinhança diagonal (jogos abertos/truncados)
+        (-1, 0), (1, 0), (0, -1), (0, 1),
+        (-1, -1), (1, 1), (-1, 1), (1, -1)
     ]
     
     for dc, df in desvios:
@@ -148,7 +161,6 @@ def analisar(home: str, away: str):
         if (nc, nf) in placares_dict and nc >= 0 and nf >= 0:
             vizinhos_candidatos.append(placares_dict[(nc, nf)])
             
-    # Ordenar vizinhos por probabilidade para pegar os 4 melhores que cercam o alvo
     vizinhos_ordenados = sorted(vizinhos_candidatos, key=lambda x: x["probabilidade"], reverse=True)
     
     respaldos = []
@@ -164,7 +176,6 @@ def analisar(home: str, away: str):
             })
             placares_usados.add(v["placar"])
             
-    # Fallback caso a vizinhança não preencha 4 placares (ex: se o alvo for 0-0 de canto)
     if len(respaldos) < 4:
         for item in placares_ordenados:
             if item["placar"] not in placares_usados and len(respaldos) < 4:
