@@ -19,16 +19,14 @@ BASE_URL = "https://v3.football.api-sports.io"
 def buscar_estatisticas_e_liga(time_nome: str):
     headers = {
         "x-apisports-key": API_KEY,
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+        "x-rapidapi-host": "v3.football.api-sports.io"
     }
-    liga_nome = "Competição Geral"
     query = time_nome.strip()
     
     try:
+        # 1. Tentar buscar o time pelo nome na API-Football
         url_busca = f"{BASE_URL}/teams?search={query}"
-        response = requests.get(url_busca, headers=headers, timeout=8)
-        
-        print(f"API Search status para '{query}': {response.status_code}")
+        response = requests.get(url_busca, headers=headers, timeout=10)
         
         if response.status_code == 200:
             data = response.json()
@@ -36,12 +34,12 @@ def buscar_estatisticas_e_liga(time_nome: str):
             
             if teams:
                 team_id = teams[0].get("team", {}).get("id")
-                print(f"Equipa encontrada: {teams[0].get('team', {}).get('name')} (ID: {team_id})")
+                team_real_name = teams[0].get("team", {}).get("name")
+                print(f"Sucesso! Time encontrado: {team_real_name} (ID: {team_id})")
                 
+                # 2. Buscar os últimos 10 jogos finalizados
                 url_fixtures = f"{BASE_URL}/fixtures?team={team_id}&last=10&status=FT"
-                res_fixtures = requests.get(url_fixtures, headers=headers, timeout=8)
-                
-                print(f"API Fixtures status: {res_fixtures.status_code}")
+                res_fixtures = requests.get(url_fixtures, headers=headers, timeout=10)
                 
                 if res_fixtures.status_code == 200:
                     fixtures_data = res_fixtures.json().get("response", [])
@@ -68,30 +66,31 @@ def buscar_estatisticas_e_liga(time_nome: str):
                         media_defesa = float(round(gols_sofridos / total_jogos, 2))
                         
                         return {
-                            "ataque": max(media_ataque, 0.40),
-                            "defesa": max(media_defesa, 0.40),
+                            "ataque": max(media_ataque, 0.50),
+                            "defesa": max(media_defesa, 0.50),
                             "forma": 1.05,
                             "liga": liga_nome
                         }
-            else:
-                print(f"Nenhuma equipa encontrada para a busca: '{query}'")
-        else:
-            print(f"Erro na resposta da API: {response.text}")
-
-        hash_nome = sum(ord(c) for c in query)
-        ataque_var = float(round(1.0 + (hash_nome % 50) / 100.0, 2))
-        defesa_var = float(round(1.0 + ((hash_nome * 3) % 45) / 100.0, 2))
-        return {"ataque": ataque_var, "defesa": defesa_var, "forma": 1.00, "liga": "Busca Personalizada"}
+        
+        # Se a API não retornar dados, usamos estatísticas dinâmicas baseadas no nome para variar os resultados
+        print(f"Aviso: Usando fallback para '{query}'")
+        tamanho = len(query)
+        return {
+            "ataque": float(round(1.10 + (tamanho % 4) * 0.2, 2)),
+            "defesa": float(round(0.90 + (tamanho % 3) * 0.15, 2)),
+            "forma": 1.00,
+            "liga": "Competição Geral"
+        }
         
     except Exception as e:
-        print(f"Exceção ao conectar com a API: {str(e)}")
-        return {"ataque": 1.25, "defesa": 1.15, "forma": 1.00, "liga": "Competição Geral"}
+        print(f"Erro crítico na API para '{query}': {str(e)}")
+        return {"ataque": 1.30, "defesa": 1.10, "forma": 1.00, "liga": "Competição Geral"}
 
 def calcular_xg_real(time_casa: str, time_fora: str):
     stats_casa = buscar_estatisticas_e_liga(time_casa)
     stats_fora = buscar_estatisticas_e_liga(time_fora)
     
-    fator_casa = 1.12
+    fator_casa = 1.15
     xg_casa = (stats_casa["ataque"] + stats_fora["defesa"]) / 2 * fator_casa * stats_casa["forma"]
     xg_fora = (stats_fora["ataque"] + stats_casa["defesa"]) / 2 * stats_fora["forma"]
     
