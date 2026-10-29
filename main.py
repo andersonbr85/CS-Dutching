@@ -13,7 +13,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-API_KEY = "B7ae21f7f0e5920369e6cd9e7bc63ccc"
+API_KEY = "40f1c8659f69678515b4991b93aff276"
 BASE_URL = "https://v3.football.api-sports.io"
 
 def buscar_estatisticas_e_liga(time_nome: str):
